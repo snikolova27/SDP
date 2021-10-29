@@ -1,0 +1,8 @@
+/home/sonya/Uni/SDP/DA implementation/CMakeFiles/rebuild_cache.dir
+/home/sonya/Uni/SDP/DA implementation/CMakeFiles/edit_cache.dir
+/home/sonya/Uni/SDP/DA implementation/vector/CMakeFiles/rebuild_cache.dir
+/home/sonya/Uni/SDP/DA implementation/vector/CMakeFiles/edit_cache.dir
+/home/sonya/Uni/SDP/DA implementation/vector/CMakeFiles/VectorTest.dir
+/home/sonya/Uni/SDP/DA implementation/proxy/CMakeFiles/rebuild_cache.dir
+/home/sonya/Uni/SDP/DA implementation/proxy/CMakeFiles/edit_cache.dir
+/home/sonya/Uni/SDP/DA implementation/proxy/CMakeFiles/Proxy.dir
