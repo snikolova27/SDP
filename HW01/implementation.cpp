@@ -13,6 +13,19 @@ Client:: Client(const int arrive, const int bananas, const int schweppes, const 
     this->banana = bananas;
     this->schweppes = schweppes;
     this->maxWaitTime = time;
+    this->maxDepartTime = arrive + time;
+}
+
+void MyStore::sortByArrivalMinute(std::vector<const Client*>& byArrival)
+{
+   std::sort(byArrival.begin(), byArrival.end(),
+            [](const Client *a, const Client *b) { return a->arriveMinute <= b->arriveMinute; });
+}
+
+void MyStore::sortByDepartureMinute(std::vector< const Client*>& byDeparture)
+{
+  std::sort(byDeparture.begin(), byDeparture.end(),
+            [](const Client *a, const Client *b) { return a->maxDepartTime <= b->maxDepartTime; });
 }
 
 std::string getResourceToString(const ResourceType& rt)
@@ -25,14 +38,14 @@ std::string getResourceToString(const ResourceType& rt)
 	
 }
 
-void sortByMin(std::vector<StoreEvent *> &log) 
+void MyStore::sortByMin(std::vector<StoreEvent *> &log) 
 {
   std::sort(log.begin(), log.end(),
             [](StoreEvent *a, StoreEvent *b) { return a->minute <= b->minute; });
             //add index client sort
 }
 
-void printLog(const std::vector<StoreEvent *> &log) 
+void MyStore::printLog(const std::vector<StoreEvent *> &log) 
 {
   int size = log.size();
   for (int i = 0; i < size; i++) 
@@ -68,14 +81,19 @@ void printLog(const std::vector<StoreEvent *> &log)
   {
     Client res;
     int min, bananas, schweppes, wait;
+    std::cout << "Enter arrive min: ";
     std::cin >> min;
     checkInput();
+    std::cout << "Enter bananas quantity: ";
     std::cin >> bananas;
     checkInput();
+    std::cout << "Enter schweppes quantity: ";
     std::cin >> schweppes;
     checkInput();
+    std::cout << "Enter max wait time: ";
     std::cin >> wait;
     checkInput();
+    std::cout << std::endl;
 
     res.arriveMinute = min;
     res.banana = bananas;
@@ -88,7 +106,6 @@ void printLog(const std::vector<StoreEvent *> &log)
   
 /// This is sample empty implementation you can place your solution here or
 /// delete this and include tests to your solution
-
 
  MyStore:: MyStore() { }
   MyStore::MyStore(int workers, int banana, int schweppes)
@@ -156,9 +173,6 @@ void printLog(const std::vector<StoreEvent *> &log)
       return this->schweppes;
    }
 
-
-
-
 Store *createStore()
  { 
    return new MyStore(); 
@@ -173,17 +187,53 @@ MyStore* createMyStore()
   void readStore(MyStore* store)
    {
     int clientCnt, workers;
-
+    std::cout << "Enter client count: ";
     std::cin >> clientCnt;
     checkInput();
 
+    std::cout << "Enter workers count:";
     std::cin >> workers;
     checkInput();
     store->workers = workers;
 
     for (int i = 0; i < clientCnt; i++) {
+      std::cout << "Enter information about client №" << i + 1 << std::endl;
       Client current = readClient();
       store->clients.push_back(&current);
       store->clientCnt++;
     }
+
+    store->fillWaiting();
+    store->sortWaiting();
   }
+
+int MyStore::findMin(const std::vector< const Client*> byArrival,const std::vector<const Client*> byDeparture, const std::vector<int> workers)
+{
+  return std::min({byArrival[0]->arriveMinute, byDeparture[0]->maxDepartTime, workers[0]});
+}
+
+void copyClients(std::vector< const Client*>source, std::vector< const Client*>& dest )
+{
+  if(!dest.empty())
+  {
+    return;
+  }
+
+  int size = source.size();
+  for(int i=0; i<size;i++)
+  {
+    dest.push_back(source[i]);
+  }
+}
+
+ void MyStore::fillWaiting()
+ {
+   copyClients(this->clients, this->waitingClientsByArrival);
+
+ }
+
+ void MyStore::sortWaiting()
+ {
+   this->sortByArrivalMinute(this->waitingClientsByArrival);
+   this->sortByDepartureMinute(this->waitingClientsByDeparture);
+ }

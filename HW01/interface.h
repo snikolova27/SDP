@@ -1,31 +1,15 @@
 #pragma once
 
-/// This is the interface you *MUST* implement in order to have test run against
-/// your solution
-
 /// The type of resource, used when creating events
 #include <ostream>
 #include <string>
 #include <vector>
 #include <iostream>
+
 enum class ResourceType {
   banana,
   schweppes,
 };
-
-// std::ostream& operator<<(std::ostream& stream, const ResourceType rt)
-
-// {
-// 	if(rt == ResourceType::banana)
-// 	{
-// 		stream << "banana";
-// 	}
-// 	else
-// 	{
-// 		stream << "schweppes";
-// 	}
-// 	return stream;
-// }
 
 /// Interface used to gather all events your solution will generate
 /// Instance of this class will be created by the tests and passed to your
@@ -64,7 +48,7 @@ struct Client {
   int banana;       ///< Amount of bananas the client wants to take
   int schweppes;    ///< Amount of schweppes the client wants to take
   int maxWaitTime;  ///< The max amount of time the client will wait before he
-                    ///< departs
+  int maxDepartTime; ///< departs
 
   Client();
   Client(const int arrive, const int bananas, const int schweppes,const int time);
@@ -114,40 +98,5 @@ struct Store {
 
 /// This function must create new instance of your store
 /// This will be used by the tests to create a store to test
-Store *createStore();
-
-std::string getResourceToString(const ResourceType &rt);
-
-/// Will be used for the log
-struct StoreEvent {
-  enum Type { WorkerSend, WorkerBack, ClientDepart };
-
-  Type type;
-  int minute;
-
-  struct Worker {
-    ResourceType resource;
-  } worker;
-
-  struct ClientEvent {
-    int index;
-    int banana;
-    int schweppes;
-  } client;
-};
-
-/// Sorts the log by minute of event and i
-/// Uses a lambda function for the sorting
-void sortByMin(std::vector<StoreEvent *> &log);
-
-/// Prints the log
-void printLog(const std::vector<StoreEvent *> &log);
-
-/// Checks if input is valid, if not - throws an exception
-void checkInput();
-
-/// Reads information about a client and return a client with such information
-Client readClient();
-
 Store *createStore();
 
