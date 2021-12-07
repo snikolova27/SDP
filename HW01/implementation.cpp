@@ -41,8 +41,8 @@ std::string getResourceToString(const ResourceType& rt)
 void MyStore::sortByMin(std::vector<StoreEvent *> &log) 
 {
   std::sort(log.begin(), log.end(),
-            [](StoreEvent *a, StoreEvent *b) { return a->minute <= b->minute; });
-            //add index client sort
+            [](StoreEvent *a, StoreEvent *b) { return a->minute <= b->minute && a->client.index <= b->client.index; });
+                //added index client sort
 }
 
 void MyStore::printLog(const std::vector<StoreEvent *> &log) 
@@ -62,7 +62,7 @@ void MyStore::printLog(const std::vector<StoreEvent *> &log)
     }
     else 
     {
-      std::cout << log[i]->client.index << " " << log[i]->client.banana << " "
+      std::cout << log[i]->minute << " " << log[i]->client.index << " " << log[i]->client.banana << " "
                 << log[i]->client.schweppes << std::endl;
     }
   }
@@ -237,3 +237,34 @@ void copyClients(std::vector< const Client*>source, std::vector< const Client*>&
    this->sortByArrivalMinute(this->waitingClientsByArrival);
    this->sortByDepartureMinute(this->waitingClientsByDeparture);
  }
+
+bool MyStore::areBananasEnough(const int & bananas)
+{
+  return this->bananas >= bananas;
+}
+
+
+bool MyStore::isSchweppesEnough(const int & schweppes)
+{
+  return this->schweppes >= schweppes;
+}
+
+void MyStore::decreaseBananas(const int bananas)
+{
+  this->bananas-=bananas;
+}
+
+void MyStore::decreaseSchweppes(const int schweppes)
+{
+  this->schweppes-= schweppes;
+}
+
+void MyStore:: incrementBananas()
+{
+  this->bananas+=INCREMENT_STOCK;
+}
+
+void MyStore::incrementSchweppes()
+{
+  this->schweppes+=INCREMENT_STOCK;
+}

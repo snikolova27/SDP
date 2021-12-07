@@ -4,9 +4,13 @@
 int main()
 {
  MyStore* store = createMyStore();
-readStore(store);
+    readStore(store);
 std::cout << store->clients[0]->arriveMinute;
+//store->incrementBananas();
+//std::cout << store->bananas;
  delete store;
+
+
 }
  
 /* start 15 15
