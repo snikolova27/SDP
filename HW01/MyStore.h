@@ -119,10 +119,16 @@ void closeStore();
 /// Checks if there are any workers available
   bool isWorkerAvailable();
 
-//------ TODO ------
-
 /// Check if the first by arival and the first by departute are the same
   bool areTheFirstsSame();
+  
+///Find which client arrived first
+const Client* findFirstOfTwo(const Client* first, const Client* second);
+
+
+//------ TODO ------
+  // MAKE SOME FUNCTIONS PRIVATE
+
 
 ///Checks if there is already a worker sent that can satisfy the request
   bool isWorkerSent(const ResourceType rt);

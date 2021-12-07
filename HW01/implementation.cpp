@@ -328,6 +328,14 @@ bool MyStore::areTheFirstsSame()
   return arrival == departure;
 }
 
+const Client* MyStore::findFirstOfTwo(const Client* first, const Client* second)
+{
+  int arrivalFirst = first->arriveMinute;
+  int arrivalSecond = second->arriveMinute;
+  
+  return (arrivalFirst < arrivalSecond) ? first : second;
+}
+
 bool MyStore::isWorkerSent(const ResourceType rt)
 {
   if(this->workersBackTimes.isEmpty()) //no workers have been sent to restock
@@ -335,28 +343,70 @@ bool MyStore::isWorkerSent(const ResourceType rt)
     return false;
   }
 
-  //add a check if first by arrival == first by departure, if not - choose the one with the lesser index
+  int nextInLineArrival = this->currentFirstInLineArrival + 1;
+  int nextInLineDeparture = this->currentFirstInLineDeparture + 1;
+  const Client* firstByArrival = this->waitingClientsByArrival[nextInLineArrival -1];
+  const Client* firstByDeparture = this->waitingClientsByDeparture[nextInLineDeparture - 1];
+  const Client* secondByArrival = this->waitingClientsByArrival[nextInLineArrival];
+  const Client* secondByDeparture = this->waitingClientsByDeparture[nextInLineDeparture];
 
-  int requestedB = requestedBananas(this->waitingClientsByArrival[this->currentFirstInLineArrival]);
-  int requestedS = requestedSchweppes(this->waitingClientsByArrival[this->currentFirstInLineArrival]);
-  int clientMaxDepart = this->waitingClientsByArrival[this->currentFirstInLineArrival]->maxDepartTime;
-  ResourceType resource = this->workersBackTimes.first().resource;
-  int workerBackTime = this->workersBackTimes.first().comeBackTime;
-    
-  if(clientMaxDepart < workerBackTime) //this worker would't be able to come back in time
-  {
-    return false;
-  }
-  else if (resource == ResourceType::banana && requestedB <= (this->getBanana() + INCREMENT_STOCK)) 
-  {
+  int requestedB, requestedS, clientMaxDepart, workerBackTime, bananasToBeSold, schweppesToBeSold, timeFirstClient;
+  ResourceType resource;
+  
+//  TODO: iznesi v otdelna funkciq if-ovete OPRAVI FUNKCIQTA
 
-    return requestedS == -1;
+  //Looking at the first client to be served
+    if(firstByArrival == firstByDeparture) //if they are the same client
+    {
+      bananasToBeSold = requestedBananas(firstByArrival);
+      schweppesToBeSold = requestedSchweppes(firstByArrival);
+      timeFirstClient = firstByArrival->maxDepartTime;
+      
+    }
+    else
+    {
+      const Client* firstToBeServed = findFirstOfTwo(firstByArrival, firstByDeparture);
+      bananasToBeSold = requestedBananas(firstToBeServed);
+      schweppesToBeSold = requestedSchweppes(firstToBeServed);
+      timeFirstClient = firstToBeServed->maxDepartTime;
+  
+    }
+    //Looking at the next client to be served
+    if(secondByArrival == secondByDeparture) // if they are the same client
+    {
+        requestedB = requestedBananas(secondByArrival);
+        requestedS = requestedSchweppes(secondByArrival);
+        clientMaxDepart = secondByArrival->maxDepartTime;
+    }
+    else  //find the one with lesser index == the one who arrived first
+    {
+      const Client* first = findFirstOfTwo(secondByArrival, secondByDeparture);
+      requestedB = requestedBananas(first);
+      requestedS = requestedSchweppes(first);
+      clientMaxDepart = first->maxDepartTime;
+
+    }
+     resource = this->workersBackTimes.first().resource;
+     workerBackTime = this->workersBackTimes.first().comeBackTime;
+
+    // Left over stock after the first client has been served 
+     int leftOverBananas = this->getBanana() - bananasToBeSold;
+     int leftOverScheppes = this->getSchweppes() - schweppesToBeSold;
     
-  }
-  else if ( resource == ResourceType::schweppes && requestedS <=(this->getSchweppes() + INCREMENT_STOCK))
-  {
-    return requestedB == -1;
-  }
+    if(clientMaxDepart < workerBackTime || timeFirstClient < workerBackTime) //this worker would't be able to come back in time
+    {
+      return false;
+    }
+    else if (resource == ResourceType::banana && requestedB <= leftOverBananas + INCREMENT_STOCK) // worker would have restocked
+    {
+      std::cout << leftOverBananas << " v isWorkerSend banani" << std::endl;
+      return true;
+      
+    }
+    else if ( resource == ResourceType::schweppes && requestedS <= leftOverScheppes + INCREMENT_STOCK)
+    {
+      return true;
+    }
 
   return false;
 }

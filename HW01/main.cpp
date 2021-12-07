@@ -9,12 +9,21 @@ readStore(store);
 store->printClients();
 
 
- std::cout << store->waitingClientsByArrival[store->currentFirstInLineArrival]->maxDepartTime << std::endl;
-std::cout << store->waitingClientsByDeparture[0]->arriveMinute << std::endl;
- std::cout << store->waitingClientsByDeparture[store->currentFirstInLineDeparture]->maxDepartTime << std::endl;
+//  std::cout << store->waitingClientsByArrival[store->currentFirstInLineArrival]->maxDepartTime << std::endl;
+//  std::cout << store->waitingClientsByDeparture[0]->arriveMinute << std::endl;
+//  std::cout << store->waitingClientsByDeparture[store->currentFirstInLineDeparture]->maxDepartTime << std::endl;
 
 store->sendWorker(0, ResourceType::banana);
-std::cout << std::boolalpha<< store->areTheFirstsSame() << std::endl;
+store->sendWorker(3, ResourceType::banana); //worker would not be send if the clients are
+                                            /* 0 10 10 75
+                                               2 12 12 70 ->trugna  за бананите
+                                               should send worker if
+                                               2 98 98 75
+                                               3 25 25 100 ->trugna за бананите
+                                            */
+
+                                            
+//std::cout << std::boolalpha<< store->areTheFirstsSame() << std::endl;
 store->printLog();
 store->emptyClientsVectors();
 
