@@ -11,6 +11,30 @@ enum class ResourceType {
   schweppes,
 };
 
+/// These structs will be used for the log
+ struct Worker {
+    ResourceType resource;
+    int comeBackTime;
+
+    Worker(){}
+    Worker(const ResourceType rt, const int min) : resource(rt), comeBackTime(min){};
+  };
+
+struct StoreEvent {
+  enum Type { WorkerSend, WorkerBack, ClientDepart };
+
+  Type type;
+  int minute;
+  Worker  worker;
+  struct ClientEvent {
+    int index;
+    int banana;
+    int schweppes;
+  } client;
+  
+  //StoreEvent(){}
+};
+
 /// Interface used to gather all events your solution will generate
 /// Instance of this class will be created by the tests and passed to your
 /// implementation
@@ -37,9 +61,8 @@ struct ActionHandler {
   /// @param minute - the time at which the client departs from the store
   /// @param banana - amount of bananas the client takes when departing
   /// @param schweppes - amount of schweppes the client takes when departing
-  virtual void onClientDepart(
-      int index, int minute, int banana,
-      int schweppes) = 0; //извеждаме съобщение + трием клиент от двете опашки
+  virtual void onClientDepart( int index, int minute, int banana,int schweppes) = 0; 
+  //извеждаме съобщение + трием клиент от двете опашки
 };
 
 /// Descriptor of a client that arrives at the store
@@ -47,11 +70,12 @@ struct Client {
   int arriveMinute; ///< The time at which client arrives
   int banana;       ///< Amount of bananas the client wants to take
   int schweppes;    ///< Amount of schweppes the client wants to take
-  int maxWaitTime;  ///< The max amount of time the client will wait before he
-  int maxDepartTime; ///< departs
+  int maxWaitTime;  ///< The max amount of time the client will wait before he departs
+  int maxDepartTime; ///< The max minute at which the client will depart
 
   Client();
   Client(const int arrive, const int bananas, const int schweppes,const int time);
+  friend bool operator ==(const Client& current, const Client& other);
 };
 
 /// The interface that your solution needs to implement

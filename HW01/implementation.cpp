@@ -15,6 +15,14 @@ Client:: Client(const int arrive, const int bananas, const int schweppes, const 
     this->maxWaitTime = time;
     this->maxDepartTime = arrive + time;
 }
+bool operator ==(const Client& current, const Client& other)
+{
+  return (current.arriveMinute == other.arriveMinute && 
+          current.banana == other.banana &&
+          current.schweppes == other.schweppes &&
+          current.maxWaitTime == other.maxWaitTime &&
+          current.maxDepartTime == other.maxDepartTime);
+}
 
 void MyStore::sortByArrivalMinute(std::vector<const Client*>& byArrival)
 {
@@ -45,25 +53,25 @@ void MyStore::sortByMin(std::vector<StoreEvent *> &log)
                 //added index client sort
 }
 
-void MyStore::printLog(const std::vector<StoreEvent *> &log) 
+void MyStore::printLog() 
 {
-  int size = log.size();
+  int size = this->log.size();
   for (int i = 0; i < size; i++) 
   {
-    if (log[i]->type == StoreEvent::Type::WorkerSend) 
+    if (this->log[i].type == StoreEvent::Type::WorkerSend) 
     {
-      std::cout << "W " << log[i]->minute << " " << getResourceToString(log[i]->worker.resource)
+      std::cout << "W " << this->log[i].minute << " " << getResourceToString(this->log[i].worker.resource)
                 << std::endl;
     } 
-    else if (log[i]->type == StoreEvent::Type::WorkerBack)
+    else if (this->log[i].type == StoreEvent::Type::WorkerBack)
     {
-      std::cout << "D " << log[i]->minute << " " <<  getResourceToString(log[i]->worker.resource)
+      std::cout << "D " << this->log[i].minute << " " <<  getResourceToString(this->log[i].worker.resource)
                 << std::endl;
     }
     else 
     {
-      std::cout << log[i]->minute << " " << log[i]->client.index << " " << log[i]->client.banana << " "
-                << log[i]->client.schweppes << std::endl;
+      std::cout << this->log[i].minute << " " << this->log[i].client.index << " " << this->log[i].client.banana << " "
+                << this->log[i].client.schweppes << std::endl;
     }
   }
 }
@@ -77,10 +85,10 @@ void MyStore::printLog(const std::vector<StoreEvent *> &log)
     }
   }
 
-  Client readClient() 
+  Client* readClient() 
   {
-    Client res;
-    int min, bananas, schweppes, wait;
+    Client* res = new Client();
+    int min, bananas, schweppes, wait, depart;
     std::cout << "Enter arrive min: ";
     std::cin >> min;
     checkInput();
@@ -94,12 +102,15 @@ void MyStore::printLog(const std::vector<StoreEvent *> &log)
     std::cin >> wait;
     checkInput();
     std::cout << std::endl;
-
-    res.arriveMinute = min;
-    res.banana = bananas;
-    res.schweppes = schweppes;
-    res.maxWaitTime = wait;
-
+    depart = min + wait;
+      
+    res->arriveMinute = min;
+    res->banana = bananas;
+    res->schweppes = schweppes;
+    res->maxWaitTime = wait;
+    res->maxDepartTime = depart;
+   
+    std::cin.ignore();
     return res;
   }
 
@@ -127,7 +138,7 @@ void MyStore::printLog(const std::vector<StoreEvent *> &log)
   }
 
   /// Adds a single client to the store
-  void MyStore:: addClient(const Client *client)
+  void MyStore:: addClient(const Client* client)
   {
     this->clients.push_back(client);
     this->clientCnt++;
@@ -173,10 +184,10 @@ void MyStore::printLog(const std::vector<StoreEvent *> &log)
       return this->schweppes;
    }
 
-Store *createStore()
- { 
-   return new MyStore(); 
-}
+// Store *createStore()
+//  { 
+//    return new MyStore(); 
+// }
 
 MyStore* createMyStore()
 {
@@ -198,8 +209,8 @@ MyStore* createMyStore()
 
     for (int i = 0; i < clientCnt; i++) {
       std::cout << "Enter information about client №" << i + 1 << std::endl;
-      Client current = readClient();
-      store->clients.push_back(&current);
+      Client* current = readClient();
+      store->clients.push_back(current);
       store->clientCnt++;
     }
 
@@ -212,7 +223,7 @@ int MyStore::findMin(const std::vector< const Client*> byArrival,const std::vect
   return std::min({byArrival[0]->arriveMinute, byDeparture[0]->maxDepartTime, workers[0]});
 }
 
-void copyClients(std::vector< const Client*>source, std::vector< const Client*>& dest )
+void copyClients(const std::vector< const Client*>source, std::vector< const Client*>& dest )
 {
   if(!dest.empty())
   {
@@ -222,18 +233,35 @@ void copyClients(std::vector< const Client*>source, std::vector< const Client*>&
   int size = source.size();
   for(int i=0; i<size;i++)
   {
-    dest.push_back(source[i]);
+    dest.push_back(source[i]); 
+  }
+}
+
+void MyStore:: printClients()
+{
+  int size = this->clients.size();
+  for(int i=0;i<size;i++)
+  {
+    std::cout << this->clients[i]->arriveMinute << " " << this->clients[i]->banana << " " <<  this->clients[i]->schweppes << " "<< this->clients[i]->maxWaitTime << " "<<  this->clients[i]->maxDepartTime << std::endl;
   }
 }
 
  void MyStore::fillWaiting()
  {
    copyClients(this->clients, this->waitingClientsByArrival);
+   copyClients(this->clients, this->waitingClientsByDeparture);
 
  }
 
  void MyStore::sortWaiting()
  {
+   int sizeA = this->waitingClientsByArrival.size();
+   int sizeD = this->waitingClientsByDeparture.size();
+   if(sizeA == sizeD && sizeA == 1)
+   {
+     return;
+   }
+
    this->sortByArrivalMinute(this->waitingClientsByArrival);
    this->sortByDepartureMinute(this->waitingClientsByDeparture);
  }
@@ -267,4 +295,103 @@ void MyStore:: incrementBananas()
 void MyStore::incrementSchweppes()
 {
   this->schweppes+=INCREMENT_STOCK;
+}
+
+int MyStore::requestedBananas(const Client* client)
+{
+  if( client->banana == 0)
+  {
+    return -1;
+  }
+  return client->banana;
+}
+
+int MyStore::requestedSchweppes(const Client* client)
+{
+  if( client->schweppes == 0)
+  {
+    return -1;
+  }
+  return client->schweppes;
+}
+
+bool MyStore::isWorkerAvailable()
+{
+  return this->workers != 0;
+}
+
+bool MyStore::areTheFirstsSame()
+{
+  const Client* arrival = this->waitingClientsByArrival[this->currentFirstInLineArrival];
+  const Client* departure = this->waitingClientsByDeparture[this->currentFirstInLineDeparture];
+
+  return arrival == departure;
+}
+
+bool MyStore::isWorkerSent(const ResourceType rt)
+{
+  if(this->workersBackTimes.isEmpty()) //no workers have been sent to restock
+  {
+    return false;
+  }
+
+  //add a check if first by arrival == first by departure, if not - choose the one with the lesser index
+
+  int requestedB = requestedBananas(this->waitingClientsByArrival[this->currentFirstInLineArrival]);
+  int requestedS = requestedSchweppes(this->waitingClientsByArrival[this->currentFirstInLineArrival]);
+  int clientMaxDepart = this->waitingClientsByArrival[this->currentFirstInLineArrival]->maxDepartTime;
+  ResourceType resource = this->workersBackTimes.first().resource;
+  int workerBackTime = this->workersBackTimes.first().comeBackTime;
+    
+  if(clientMaxDepart < workerBackTime) //this worker would't be able to come back in time
+  {
+    return false;
+  }
+  else if (resource == ResourceType::banana && requestedB <= (this->getBanana() + INCREMENT_STOCK)) 
+  {
+
+    return requestedS == -1;
+    
+  }
+  else if ( resource == ResourceType::schweppes && requestedS <=(this->getSchweppes() + INCREMENT_STOCK))
+  {
+    return requestedB == -1;
+  }
+
+  return false;
+}
+
+void MyStore::sendWorker(int minute, const ResourceType rt)
+{
+  if(this->isWorkerAvailable() && !isWorkerSent(rt))
+  {
+    Worker worker = Worker(rt, (minute +60));
+    StoreEvent ev;
+    ev.type = StoreEvent::WorkerSend;
+    ev.worker =worker;
+    ev.minute = minute;
+
+    this->log.push_back(ev);
+    this->workers--;
+    this->workersBackTimes.enqueue(worker);
+  }
+  else { return; }
+}
+
+void MyStore:: emptyClientsVectors()
+{
+  int size = this->clients.size();
+  for(int i=0; i<size;i++)
+  {
+    /// Memory is allocated only when pushing clients in this vector, in the other two there are copies of the pointers
+    delete this->clients[i];
+  }
+}
+
+void MyStore::closeStore()
+{
+  this->emptyClientsVectors();
+  this->clients.clear();
+  this->waitingClientsByArrival.clear();
+  this->waitingClientsByDeparture.clear();
 }

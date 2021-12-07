@@ -1,11 +1,24 @@
 #include "interface.h"
 #include "MyStore.h"
+#include <ios>
 
 int main()
 {
  MyStore* store = createMyStore();
-    readStore(store);
-std::cout << store->clients[0]->arriveMinute;
+readStore(store);
+store->printClients();
+
+
+ std::cout << store->waitingClientsByArrival[store->currentFirstInLineArrival]->maxDepartTime << std::endl;
+std::cout << store->waitingClientsByDeparture[0]->arriveMinute << std::endl;
+ std::cout << store->waitingClientsByDeparture[store->currentFirstInLineDeparture]->maxDepartTime << std::endl;
+
+store->sendWorker(0, ResourceType::banana);
+std::cout << std::boolalpha<< store->areTheFirstsSame() << std::endl;
+store->printLog();
+store->emptyClientsVectors();
+
+
 //store->incrementBananas();
 //std::cout << store->bananas;
  delete store;
