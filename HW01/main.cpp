@@ -14,13 +14,24 @@ store->printClients();
 //  std::cout << store->waitingClientsByDeparture[store->currentFirstInLineDeparture]->maxDepartTime << std::endl;
 
 store->sendWorker(0, ResourceType::banana);
-store->sendWorker(3, ResourceType::banana); //worker would not be send if the clients are
+//store->sendWorker(2 ResourceType::banana); //worker would not be send if the clients are
                                             /* 0 10 10 75
                                                2 12 12 70 ->trugna  за бананите
+
                                                should send worker if
                                                2 98 98 75
                                                3 25 25 100 ->trugna за бананите
+
+                                               test za onReturn, pak samo za bananite -> 2 rabotnika za banani, ama ne sum pusnala da hodi za schweppes
+                                               0 10 10 75
+                                               2 98 98 75   -> BACHKAME ZA DVA BANANA
+                                                            -> BACHKAME ZA BANAN + SCHWEPPES
+
+
                                             */
+store->sendWorker(0, ResourceType::schweppes);
+store->onReturn(60, ResourceType::banana); 
+store->onReturn(62, ResourceType:: schweppes);
 
                                             
 //std::cout << std::boolalpha<< store->areTheFirstsSame() << std::endl;

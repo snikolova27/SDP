@@ -163,15 +163,15 @@ void MyStore::printLog()
   }
 
   /// Return the index of a client in the store
-  int MyStore:: getClientId(const Client *client)
+  int MyStore:: getClientId(const Client *client, std::vector<const Client*> v)
   {
     std::vector<const Client *>::iterator it =
-        std::find(this->clients.begin(), this->clients.end(), client);
-    if (it == this->clients.end()) // if client was not found
+        std::find(v.begin(), v.end(), client);
+    if (it == v.end()) // if client was not found
     {
       return -1;
     }
-    return it - this->clients.begin();
+    return it - v.begin();
   }
 
   int MyStore::getBanana() const 
@@ -335,10 +335,28 @@ const Client* MyStore::findFirstOfTwo(const Client* first, const Client* second)
   
   return (arrivalFirst < arrivalSecond) ? first : second;
 }
+int MyStore::whichResource(const Client* client)
+{
+  int requestedB = requestedBananas(client);
+  int requestedS = requestedSchweppes(client);
+  if( requestedB > 0 && requestedS == 0 )
+  {
+    return 0; //would mean that the client only wants bananas
+  }
+  else if (requestedB == 0 && requestedS > 0)
+  {
+    return 1; //would mean that the client only wants schweppes
+  }
+  else if (requestedB > 0 && requestedS > 0)
+  {
+    return 2; //would mean that the client wants both
+  }  
+  else {return -1;}
+}
 
 bool MyStore::isWorkerSent(const ResourceType rt)
 {
-  if(this->workersBackTimes.isEmpty()) //no workers have been sent to restock
+  if(this->workersBackTimes.isEmpty()) //no workers have been sent to restock anything
   {
     return false;
   }
@@ -353,7 +371,7 @@ bool MyStore::isWorkerSent(const ResourceType rt)
   int requestedB, requestedS, clientMaxDepart, workerBackTime, bananasToBeSold, schweppesToBeSold, timeFirstClient;
   ResourceType resource;
   
-//  TODO: iznesi v otdelna funkciq if-ovete OPRAVI FUNKCIQTA
+//  TODO: iznesi v otdelna funkciq if-ovete 
 
   //Looking at the first client to be served
     if(firstByArrival == firstByDeparture) //if they are the same client
@@ -371,6 +389,7 @@ bool MyStore::isWorkerSent(const ResourceType rt)
       timeFirstClient = firstToBeServed->maxDepartTime;
   
     }
+
     //Looking at the next client to be served
     if(secondByArrival == secondByDeparture) // if they are the same client
     {
@@ -397,7 +416,7 @@ bool MyStore::isWorkerSent(const ResourceType rt)
     {
       return false;
     }
-    else if (resource == ResourceType::banana && requestedB <= leftOverBananas + INCREMENT_STOCK) // worker would have restocked
+    else if (resource == ResourceType::banana && requestedB <= leftOverBananas + INCREMENT_STOCK) // worker would have restocked and returned in time
     {
       std::cout << leftOverBananas << " v isWorkerSend banani" << std::endl;
       return true;
@@ -413,6 +432,7 @@ bool MyStore::isWorkerSent(const ResourceType rt)
 
 void MyStore::sendWorker(int minute, const ResourceType rt)
 {
+
   if(this->isWorkerAvailable() && !isWorkerSent(rt))
   {
     Worker worker = Worker(rt, (minute +60));
@@ -438,10 +458,91 @@ void MyStore:: emptyClientsVectors()
   }
 }
 
+void MyStore::doRequest(const Client* client)
+{
+  int min = client->arriveMinute;
+  int resources = this->whichResource(client);
+  if( resources == 0)
+  {
+    this->sendWorker(min, ResourceType::banana);
+  }
+  else if (resources == 1)
+  {
+    this->sendWorker(min, ResourceType::schweppes);
+  }
+  else if ( resources == 2)
+  {
+      this->sendWorker(min, ResourceType::banana);
+      this->sendWorker(min, ResourceType::schweppes);
+  }
+  else {return;}
+}
+
 void MyStore::closeStore()
 {
   this->emptyClientsVectors();
   this->clients.clear();
   this->waitingClientsByArrival.clear();
   this->waitingClientsByDeparture.clear();
+}
+
+void MyStore:: popClient(int minute, const Client* client)
+{
+  const Client* firstByArrival = this->waitingClientsByArrival[this->currentFirstInLineArrival];
+  const Client* firstByDeparture = this->waitingClientsByDeparture[this->currentFirstInLineDeparture];
+
+  if(firstByArrival == firstByDeparture && firstByArrival == client)
+  {
+    this->currentFirstInLineArrival++;
+    this->currentFirstInLineDeparture++;
+  }
+  else if ( client == firstByArrival)
+  {
+    this->currentFirstInLineArrival++;
+    int idxInDeparture = getClientId(client, this->waitingClientsByDeparture);
+    // we have to put the client that's been serviced in the front of the vector and on their place put the one tha
+    
+
+    // [12,20,45,75,100]
+
+  }
+  else 
+  {
+    this->currentFirstInLineDeparture++;
+  }
+}
+
+
+void MyStore::onReturn(int minute, const ResourceType rt)
+{
+  //check what resource +
+  //increment in the store +
+  //pop client that needed it --purvo napishi funkciqta za pop-vane na klient, prostachkooo
+  //increment workers +
+  // dequeue worker +
+  //push into log +
+  //  -the worker +
+  //  - the client leaving with the resource and at what minute --tova da stava v pop client
+
+  // Increment resource
+  if(rt == ResourceType::banana)
+  {
+    this->incrementBananas();
+  }
+  else 
+  {
+    this->incrementSchweppes();
+  }
+
+  // Worker is back
+  this->workersBackTimes.dequeue();
+  std::cout << this->workersBackTimes.isEmpty() << " v onReturn alooo, prazni li sme" << std::endl;
+  this->workers++;
+
+  StoreEvent ev;
+  ev.minute = minute;
+  ev.type = StoreEvent::WorkerBack;
+  ev.worker.resource = rt;
+
+  this->log.push_back(ev);
 }

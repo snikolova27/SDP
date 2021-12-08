@@ -52,8 +52,8 @@ struct MyStore : Store
   /// Adds more than one client to the store
   void addClients(const Client *clients, int count) override;
 
-  /// Return the index of a client in the store
-  int getClientId(const Client *client);
+  /// Return the index of a client in the store, v - vector to search in
+  int getClientId(const Client *client, std::vector<const Client*> v);
 
  /// Returns current banana quantity in the store
   virtual int getBanana() const override ;
@@ -121,20 +121,25 @@ void closeStore();
 
 /// Check if the first by arival and the first by departute are the same
   bool areTheFirstsSame();
-  
+
 ///Find which client arrived first
 const Client* findFirstOfTwo(const Client* first, const Client* second);
-
-
-//------ TODO ------
-  // MAKE SOME FUNCTIONS PRIVATE
-
 
 ///Checks if there is already a worker sent that can satisfy the request
   bool isWorkerSent(const ResourceType rt);
 
+/// Returns which resource a client wants  - returns 0 for bananas, 1 for schweppes, 2 for both, -1 if not valid
+int whichResource(const Client* client);
+
+/// Send worker/s for a request
+void doRequest(const Client* client);
+
 /// Send a worker for the given resource
   void sendWorker(int minute, const ResourceType rt);
+
+//------ TODO ------
+  // MAKE SOME FUNCTIONS PRIVATE
+
 
 /// Worker comes back
   void onReturn(int minute, const ResourceType rt);
