@@ -7,8 +7,8 @@ int main()
 //readStore(store);
 // Client clients [2];
 store->workers = 2;
-Client* cl1 = new Client (0,0,10,65);
- Client* cl2= new Client (2,10,0,75);
+Client cl1 = Client (0,0,10,65);
+ Client cl2 =  Client (2,11,0,75);
 // clients[0] = cl1;
 // clients[1] = cl2;
 
@@ -17,13 +17,14 @@ Client* cl1 = new Client (0,0,10,65);
 //store->addClients(clients, 2);
 store->addClient(cl1);
 store->addClient(cl2);
-std::cout << store->clients[0]->schweppes << std::endl;
-std::cout << store->waitingClientsByDeparture[0]->schweppes << std::endl;
+//std::cout << store->clients[0].schweppes << std::endl;
+std::cout << store->waitingClientsByDeparture[0].schweppes << std::endl;
+std::cout << store->waitingClientsByDeparture[1].arriveMinute << " " << store->waitingClientsByDeparture[1].schweppes << std::endl;
 
 //std::cout << store->waitingClientsByArrival.size() << std::endl;
 //std::cout << store->requestedBananas(cl1) << std::endl;
-//store->printClients();
-store->generateEvents(150);
+store->printClients();
+store->generateEvents(80);
 
 //  std::cout << store->waitingClientsByArrival[store->currentFirstInLineArrival]->maxDepartTime << std::endl;
 //  std::cout << store->waitingClientsByDeparture[0]->arriveMinute << std::endl;
@@ -53,12 +54,12 @@ store->generateEvents(150);
                                             
 //std::cout << std::boolalpha<< store->areTheFirstsSame() << std::endl;
 //store->printLog();
-store->emptyClientsVectors();
+//store->emptyClientsVectors();
 
 
 //store->incrementBananas();
 //std::cout << store->bananas;
- delete store;
+ //delete store;
 
 
 }

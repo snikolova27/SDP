@@ -75,6 +75,7 @@ struct Client {
   bool popped;       ///< If a client has left
 
   Client();
+  Client(const Client& other);
   Client(const int arrive, const int bananas, const int schweppes,const int time);
   friend bool operator ==(const Client& current, const Client& other);
 };

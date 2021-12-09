@@ -15,16 +15,16 @@ struct MyStore : Store
   int clientInLog = 0;
 
   /// Vector of clients, won't be deleting clients from here
-  std::vector<Client*> clients;
+  std::vector<Client> clients;
 
   /// Vector of waiting clients sorted by their departure time, will put -1 if a client has been catered to, so we don't have to erase from the vector
-  std::vector <Client*> waitingClientsByDeparture; 
+  std::vector <Client> waitingClientsByDeparture; 
 
   /// Will hold the index of the first client that needs to be catered to by departure, will change this index instead of erasing from the vector
   int currentFirstInLineDeparture = 0;
 
   /// Vector of waiting clients sorted by their arrival minute, will put -1 if a client has been catered to, so we don't have to erase from the vector
-  std::vector< Client*> waitingClientsByArrival;
+  std::vector< Client> waitingClientsByArrival;
 
   /// Will hold the index of the first client that needs to be catered to by arrival, will change this index instead of erasing from the vector
   int currentFirstInLineArrival = 0;
@@ -49,19 +49,19 @@ struct MyStore : Store
   virtual void advanceTo(int minute) override;
 
   /// Adds a single client to the store
-  void addClient( Client* client);
+  void addClient( Client client);
 
   /// Adds more than one client to the store
   void addClients(const Client *clients, int count) override;
 
   /// Return the index of a client in the store, v - vector to search in
-  int getClientId(Client *client, std::vector<Client*> v);
+  int getClientId(Client client, std::vector<Client> v);
 
 ///Return the index of the first non-popped client from a vector v
-  int findFirstNotPopped(std::vector<Client*> v);
+  int findFirstNotPopped(std::vector<Client> v);
 
 ///Returns if all clients in a vector v are popped == have left
-  bool areAllPopped(std::vector <Client*> v);
+  bool areAllPopped(std::vector <Client> v);
 
  /// Returns current banana quantity in the store
   virtual int getBanana() const override ;
@@ -75,13 +75,13 @@ void printClients();
   void fillWaiting();
 
 /// Find minimum of waitingByArrival, waitingByDeparture, returningWorkers so we know what minute to advance to
-  int findMin(const std::vector< Client*> byArrival,const std::vector< Client*> byDeparture, const std::vector<int> workers);
+  int findMin(const std::vector< Client> byArrival,const std::vector< Client> byDeparture,const LinkedQueue<Worker> workers);
 
 /// Sorts the list of waiting clients by their arrival minute
-  void sortByArrivalMinute(std::vector<Client*>& byArrival);
+  void sortByArrivalMinute(std::vector<Client>& byArrival);
 
 /// Sorts the list of waiting clients by their max departure minute
-  void sortByDepartureMinute(std::vector<Client*>& byDeparture);
+  void sortByDepartureMinute(std::vector<Client>& byDeparture);
 
 /// Sort the waiting lists
   void sortWaiting();
@@ -94,7 +94,7 @@ void printClients();
   void printLog();
 
 /// Free the memory
-void emptyClientsVectors();
+//void emptyClientsVectors();
 
 /// Clear the vectors of client
 void closeStore();
@@ -119,10 +119,10 @@ void closeStore();
   void decreaseSchweppes(const int schweppes);
 
 /// Check how many bananas a client wants, returns -1 if they don't want any 
-  int requestedBananas( Client* client);
+  int requestedBananas( Client client);
 
 /// Check how much Schweppes a client wants, returns -1 if they don't want any 
-  int requestedSchweppes( Client* client);
+  int requestedSchweppes( Client client);
 
 /// Checks if there are any workers available
   bool isWorkerAvailable();
@@ -131,12 +131,12 @@ void closeStore();
   bool areTheFirstsSame();
 
 ///Find which client arrived first
- Client* findFirstOfTwo(Client* first,  Client* second);
+ Client findFirstOfTwo(Client first,  Client second);
 
 
 
 /// Returns which resource a client wants  - returns 0 for bananas, 1 for schweppes, 2 for both, -1 if not valid
-int whichResource( Client* client);
+int whichResource( Client client);
 
 
 
@@ -147,10 +147,10 @@ int whichResource( Client* client);
   void onReturn(int minute, const ResourceType rt);
 
 /// Remove a client from waiting lists
-  void popClient(int minute, Client* client);
+  void popClient(int minute, Client client);
 
  /// Resource with priotity
-ResourceType higherPriotity(Client* client);
+ResourceType higherPriotity(Client client);
 
 /// Return if there are any workers left in the store
 bool workersLeft();
@@ -161,7 +161,7 @@ bool workersLeft();
 
 //TODO: return the first client to be served - take it from isWorkerSent
 /// Returns the first client to be served
-Client* firstToServe();
+Client firstToServe();
 
 //TODO: look at the first client to be served
 ///Checks if there is already a worker sent that can satisfy the request of the first client to be served
@@ -170,13 +170,13 @@ Client* firstToServe();
 //TODO: make it so that it accepts the first client to be served
 /// Send worker/s for a request,return minute when resource will be enough for the given client
 /// @param client - first client to be served
-int doRequest( Client* client);
+int doRequest( Client client);
 
 /// Put client in log
 void pushClientInLog(int min, int bananas, int schweppes);
 
 /// Serves a client
-void serve(Client* client);
+void serve(Client client);
 
 /// Generate all events for the store up to a given minute
   void generateEvents( const int upToMin);
@@ -198,9 +198,9 @@ std::string getResourceToString(const ResourceType &rt);
 void checkInput();
 
 /// Reads information about a client and return a client with such information
-Client* readClient();
+Client readClient();
 
  ///Copies vector of clients to another vector of clients
-void copyClients(std::vector<Client*>  source, std::vector< Client*>& dest);
+void copyClients(std::vector<Client>  source, std::vector< Client>& dest);
 
 
