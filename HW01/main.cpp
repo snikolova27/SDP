@@ -1,19 +1,35 @@
-#include "interface.h"
 #include "MyStore.h"
-#include <ios>
+#include <iostream>
 
 int main()
 {
  MyStore* store = createMyStore();
-readStore(store);
-store->printClients();
+//readStore(store);
+// Client clients [2];
+store->workers = 2;
+Client* cl1 = new Client (0,0,10,65);
+ Client* cl2= new Client (2,10,0,75);
+// clients[0] = cl1;
+// clients[1] = cl2;
 
+// store->fillWaiting();
+// store->sortWaiting();
+//store->addClients(clients, 2);
+store->addClient(cl1);
+store->addClient(cl2);
+std::cout << store->clients[0]->schweppes << std::endl;
+std::cout << store->waitingClientsByDeparture[0]->schweppes << std::endl;
+
+//std::cout << store->waitingClientsByArrival.size() << std::endl;
+//std::cout << store->requestedBananas(cl1) << std::endl;
+//store->printClients();
+store->generateEvents(150);
 
 //  std::cout << store->waitingClientsByArrival[store->currentFirstInLineArrival]->maxDepartTime << std::endl;
 //  std::cout << store->waitingClientsByDeparture[0]->arriveMinute << std::endl;
 //  std::cout << store->waitingClientsByDeparture[store->currentFirstInLineDeparture]->maxDepartTime << std::endl;
 
-store->sendWorker(0, ResourceType::banana);
+//store->sendWorker(0, ResourceType::banana);
 //store->sendWorker(2 ResourceType::banana); //worker would not be send if the clients are
                                             /* 0 10 10 75
                                                2 12 12 70 ->trugna  за бананите
@@ -29,13 +45,14 @@ store->sendWorker(0, ResourceType::banana);
 
 
                                             */
-store->sendWorker(0, ResourceType::schweppes);
-store->onReturn(60, ResourceType::banana); 
-store->onReturn(62, ResourceType:: schweppes);
+// store->sendWorker(0, ResourceType::schweppes);
+// store->onReturn(60, ResourceType::banana); 
+// store->onReturn(62, ResourceType:: schweppes);
+// store->popClient(60, &cl1);
 
                                             
 //std::cout << std::boolalpha<< store->areTheFirstsSame() << std::endl;
-store->printLog();
+//store->printLog();
 store->emptyClientsVectors();
 
 

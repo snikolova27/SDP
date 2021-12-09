@@ -32,7 +32,7 @@ struct StoreEvent {
     int schweppes;
   } client;
   
-  //StoreEvent(){}
+  StoreEvent(){}
 };
 
 /// Interface used to gather all events your solution will generate
@@ -72,6 +72,7 @@ struct Client {
   int schweppes;    ///< Amount of schweppes the client wants to take
   int maxWaitTime;  ///< The max amount of time the client will wait before he departs
   int maxDepartTime; ///< The max minute at which the client will depart
+  bool popped;       ///< If a client has left
 
   Client();
   Client(const int arrive, const int bananas, const int schweppes,const int time);
