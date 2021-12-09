@@ -16,6 +16,16 @@ Client:: Client(const int arrive, const int bananas, const int schweppes, const 
     this->maxDepartTime = arrive + time;
     this->popped = false;
 }
+Client::Client(const Client& other)
+{
+  this->arriveMinute = other.arriveMinute;
+  this->banana = other.banana;
+  this->schweppes = other.schweppes;
+  this->maxWaitTime = other.maxWaitTime;
+  this->maxDepartTime = other.arriveMinute + other.maxWaitTime;
+  this->popped = false;
+}
+
 bool operator ==(const Client& current, const Client& other)
 {
   return (current.arriveMinute == other.arriveMinute && 
@@ -26,16 +36,16 @@ bool operator ==(const Client& current, const Client& other)
           current.popped == other.popped);
 }
 
-void MyStore::sortByArrivalMinute(std::vector<Client*>& byArrival)
+void MyStore::sortByArrivalMinute(std::vector<Client>& byArrival)
 {
    std::sort(byArrival.begin(), byArrival.end(),
-            [](const Client *a, const Client *b) { return a->arriveMinute <= b->arriveMinute; });
+            [](const Client a, const Client b) { return a.arriveMinute <= b.arriveMinute; });
 }
 
-void MyStore::sortByDepartureMinute(std::vector< Client*>& byDeparture)
+void MyStore::sortByDepartureMinute(std::vector< Client>& byDeparture)
 {
   std::sort(byDeparture.begin(), byDeparture.end(),
-            [](const Client *a, const Client *b) { return a->maxDepartTime <= b->maxDepartTime; });
+            [](const Client a, const Client b) { return a.maxDepartTime <= b.maxDepartTime; });
 }
 
 std::string getResourceToString(const ResourceType& rt)
@@ -87,9 +97,9 @@ void MyStore::printLog()
     }
   }
 
-  Client* readClient() 
+  Client readClient() 
   {
-    Client* res = new Client();
+    Client res = Client();
     int min, bananas, schweppes, wait, depart;
     std::cout << "Enter arrive min: ";
     std::cin >> min;
@@ -106,12 +116,12 @@ void MyStore::printLog()
     std::cout << std::endl;
     depart = min + wait;
       
-    res->arriveMinute = min;
-    res->banana = bananas;
-    res->schweppes = schweppes;
-    res->maxWaitTime = wait;
-    res->maxDepartTime = depart;
-    res->popped = false;
+    res.arriveMinute = min;
+    res.banana = bananas;
+    res.schweppes = schweppes;
+    res.maxWaitTime = wait;
+    res.maxDepartTime = depart;
+    res.popped = false;
    
     std::cin.ignore();
     return res;
@@ -141,15 +151,24 @@ void MyStore::printLog()
   }
 
   /// Adds a single client to the store
-  void MyStore:: addClient(Client* client)
+  void MyStore:: addClient(Client client)
   {
-    int maxDepartTime = client->arriveMinute + client->maxWaitTime;
-    client->maxDepartTime = maxDepartTime;
-    client->popped = false;
-    this->clients.push_back(client);
+    Client toAdd = Client(client.arriveMinute, client.banana, client.schweppes, client.maxWaitTime);
+    int maxDepartTime = client.arriveMinute + client.maxWaitTime;
+    toAdd.maxDepartTime = maxDepartTime;
+    toAdd.popped = false;
+    this->clients.push_back(toAdd);
     this->clientCnt++;
-    this->waitingClientsByArrival.push_back(client);
-    this->waitingClientsByDeparture.push_back(client);
+   // this->fillWaiting();
+    this->waitingClientsByArrival.push_back(toAdd);
+   this->waitingClientsByDeparture.push_back(toAdd);
+   std::cout << this->waitingClientsByArrival[0].arriveMinute << " " << this->waitingClientsByArrival[0].schweppes << std::endl;
+   if(this->waitingClientsByArrival.size() > 1)
+   {
+   std::cout << this->waitingClientsByArrival[1].arriveMinute << " " << this->waitingClientsByArrival[1].schweppes << std::endl;
+
+   }
+
     this->sortWaiting();
   }
 
@@ -160,10 +179,10 @@ void MyStore::printLog()
       {
         try 
         {
-            Client* toAdd = new Client(clients[i]);
+            Client toAdd = Client(clients[i]);
             int maxDepartTime = clients[i].arriveMinute + clients[i].maxWaitTime;
-            toAdd->maxDepartTime = maxDepartTime;
-            toAdd->popped = false;
+            toAdd.maxDepartTime = maxDepartTime;
+            toAdd.popped = false;
             this->clients.push_back(toAdd);
         } 
         catch (...) 
@@ -187,9 +206,9 @@ void MyStore::printLog()
   }
 
   /// Return the index of a client in the store
-  int MyStore:: getClientId(Client *client, std::vector<Client*> v)
+  int MyStore:: getClientId(Client client, std::vector<Client> v)
   {
-    std::vector<Client *>::iterator it =
+    std::vector<Client >::iterator it =
         std::find(v.begin(), v.end(), client);
     if (it == v.end()) // if client was not found
     {
@@ -233,7 +252,7 @@ MyStore* createMyStore()
 
     for (int i = 0; i < clientCnt; i++) {
       std::cout << "Enter information about client №" << i + 1 << std::endl;
-      Client* current = readClient();
+      Client current = readClient();
       store->clients.push_back(current);
       store->clientCnt++;
     }
@@ -242,12 +261,20 @@ MyStore* createMyStore()
     store->sortWaiting();
   }
 
-int MyStore::findMin(const std::vector< Client*> byArrival,const std::vector<Client*> byDeparture, const std::vector<int> workers)
+int MyStore::findMin(const std::vector< Client> byArrival,const std::vector<Client> byDeparture, const LinkedQueue<Worker> workers)
 {
-  return std::min({byArrival[0]->arriveMinute, byDeparture[0]->maxDepartTime, workers[0]});
+  int arriveMin = byArrival[0].arriveMinute;
+  int departMin = byDeparture[0].maxDepartTime;
+  if(!workers.isEmpty())
+  {
+      int worker = workers.first().comeBackTime;
+     return std::min({arriveMin,departMin ,worker });
+  }
+  return std::min(arriveMin, departMin);
+
 }
 
-void copyClients(const std::vector< Client*>source, std::vector< Client*>& dest )
+void copyClients(const std::vector< Client>source, std::vector< Client>& dest )
 {
   if(!dest.empty())
   {
@@ -258,6 +285,7 @@ void copyClients(const std::vector< Client*>source, std::vector< Client*>& dest 
   for(int i=0; i<size;i++)
   {
     dest.push_back(source[i]); 
+    std::cout << dest[i].arriveMinute << " " << dest[i].banana << std::endl;
   }
 }
 
@@ -266,7 +294,7 @@ void MyStore:: printClients()
   int size = this->clients.size();
   for(int i=0;i<size;i++)
   {
-    std::cout << this->clients[i]->arriveMinute << " " << this->clients[i]->banana << " " <<  this->clients[i]->schweppes << " "<< this->clients[i]->maxWaitTime << " "<<  this->clients[i]->maxDepartTime << std::endl;
+    std::cout << this->clients[i].arriveMinute << " " << this->clients[i].banana << " " <<  this->clients[i].schweppes << " "<< this->clients[i].maxWaitTime << " "<<  this->clients[i].maxDepartTime << std::endl;
   }
 }
 
@@ -321,14 +349,14 @@ void MyStore::incrementSchweppes()
   this->schweppes+=INCREMENT_STOCK;
 }
 
-int MyStore::requestedBananas(Client* client)
+int MyStore::requestedBananas(Client client)
 {
-  return client->banana;
+  return client.banana;
 }
 
-int MyStore::requestedSchweppes(Client* client)
+int MyStore::requestedSchweppes(Client client)
 {
-  return client->schweppes;
+  return client.schweppes;
 }
 
 bool MyStore::isWorkerAvailable()
@@ -338,21 +366,21 @@ bool MyStore::isWorkerAvailable()
 
 bool MyStore::areTheFirstsSame()
 {
-  const Client* arrival = this->waitingClientsByArrival[this->currentFirstInLineArrival];
-  const Client* departure = this->waitingClientsByDeparture[this->currentFirstInLineDeparture];
+  const Client arrival = this->waitingClientsByArrival[this->currentFirstInLineArrival];
+  const Client departure = this->waitingClientsByDeparture[this->currentFirstInLineDeparture];
 
   return arrival == departure;
 }
 
-Client* MyStore::findFirstOfTwo(Client* first,  Client* second)
+Client MyStore::findFirstOfTwo(Client first,  Client second)
 {
-  int arrivalFirst = first->arriveMinute;
+  int arrivalFirst = first.arriveMinute;
   std::cout << " 347 arrive min first: " <<arrivalFirst << std::endl;
-  int arrivalSecond = second->arriveMinute;
+  int arrivalSecond = second.arriveMinute;
   
   return (arrivalFirst < arrivalSecond) ? first : second;
 }
-int MyStore::whichResource(Client* client)
+int MyStore::whichResource(Client client)
 {
   int requestedB = requestedBananas(client);
   int requestedS = requestedSchweppes(client);
@@ -371,19 +399,20 @@ int MyStore::whichResource(Client* client)
   else {return -1;}
 }
 
-Client* MyStore::firstToServe()
+Client MyStore::firstToServe()
 {
   int firstByD = findFirstNotPopped(this->waitingClientsByDeparture);
   int firstByA = findFirstNotPopped(this->waitingClientsByArrival);
 
-  Client* firstByArrival = this->waitingClientsByArrival[firstByA];
-  Client* firstByDeparture = this->waitingClientsByDeparture[firstByD];
+  Client firstByArrival = this->waitingClientsByArrival[firstByA];
+  Client firstByDeparture = this->waitingClientsByDeparture[firstByD];
   // Client* secondByArrival = this->waitingClientsByArrival[nextInLineArrival];
   // Client* secondByDeparture = this->waitingClientsByDeparture[nextInLineDeparture];
 
   if(firstByArrival == firstByDeparture)
   {
     std::cout << "vlizam na 379" << std::endl;
+    std::cout<<firstByArrival.arriveMinute << std::endl;
     return firstByArrival;
   }
   else if (!areAllPopped(this->waitingClientsByArrival) || !areAllPopped(this->waitingClientsByDeparture))
@@ -406,14 +435,14 @@ bool MyStore::isWorkerSent(const ResourceType rt)
     return false;
   }
 
-    Client* firstClient = firstToServe();
+    Client firstClient = firstToServe();
     int  workerBackTime, bananasToBeSold, schweppesToBeSold, timeFirstClient;
     ResourceType resource;
 
      //Looking at the first client to be served
       bananasToBeSold = requestedBananas(firstClient);
       schweppesToBeSold = requestedSchweppes(firstClient);
-      timeFirstClient = firstClient->maxDepartTime;
+      timeFirstClient = firstClient.maxDepartTime;
       
       resource = this->workersBackTimes.first().resource;
       workerBackTime = this->workersBackTimes.first().comeBackTime;
@@ -458,15 +487,15 @@ void MyStore::sendWorker(int minute, const ResourceType rt)
   }
 }
 
-void MyStore:: emptyClientsVectors()
-{
-  int size = this->clients.size();
-  for(int i=0; i<size;i++)
-  {
-    /// Memory is allocated only when pushing clients in this vector, in the other two there are copies of the pointers
-    delete this->clients[i];
-  }
-}
+// void MyStore:: emptyClientsVectors()
+// {
+//   int size = this->clients.size();
+//   for(int i=0; i<size;i++)
+//   {
+//     /// Memory is allocated only when pushing clients in this vector, in the other two there are copies of the pointers
+//     delete this->clients[i];
+//   }
+// }
 
 bool MyStore:: workersLeft()
 {
@@ -475,11 +504,11 @@ bool MyStore:: workersLeft()
 
 //TODO: add case where there are no workers left to send and the client takes what is available
 
-int MyStore::doRequest(Client* client)
+int MyStore::doRequest(Client client)
 {
   std::cout << "vlizam v do request" << std::endl;
    ResourceType priority = this->higherPriotity(client);
-  int min = client->arriveMinute;
+  int min = client.arriveMinute;
   int resources = this->whichResource(client);
   int endMin = min;
   int endMinStart = min;
@@ -499,7 +528,7 @@ int MyStore::doRequest(Client* client)
 
         if(requestedB > this->getBanana() && !this->workersLeft() && !isWorkerSent(ResourceType::banana)) //if there are no workers left and no workers have been sent - take what's available and client leaves
         {
-          client->banana = this->getBanana();
+          client.banana = this->getBanana();
           this->bananas = 0;
           return endMin;
         }
@@ -523,7 +552,7 @@ int MyStore::doRequest(Client* client)
       {
         if(requestedS > this->getBanana() && !this->workersLeft() && !isWorkerSent(ResourceType::schweppes)) //if there are no workers left and no worker has been sent for the resource- take what's available and client leaves
         {
-          client->schweppes = this->getSchweppes();
+          client.schweppes = this->getSchweppes();
           this->schweppes = 0;
           return endMin;
         }
@@ -548,7 +577,7 @@ int MyStore::doRequest(Client* client)
 
             if(requestedB > this->getBanana() && !this->workersLeft() && !isWorkerSent(ResourceType::banana)) //if there are no workers left and no workers have been sent - take what's available and client leaves
               {
-                  client->banana = this->getBanana();
+                  client.banana = this->getBanana();
                   this->bananas = 0;
               }
             if( requestedB > this-> getBanana() && !isWorkerSent(ResourceType::banana)  && this->workersLeft()) //if there is a worker, send them for the resource needed
@@ -562,7 +591,7 @@ int MyStore::doRequest(Client* client)
           
             if(requestedS > this->getSchweppes() && !this->workersLeft() && !isWorkerSent(ResourceType::schweppes))
             {
-                   client->schweppes = this->getSchweppes();
+                   client.schweppes = this->getSchweppes();
                    this->schweppes = 0;
             }
             if( requestedS > this->getSchweppes() && !isWorkerSent(ResourceType::schweppes)  && this->workersLeft())
@@ -582,7 +611,7 @@ int MyStore::doRequest(Client* client)
             {
                if(requestedS > this->getSchweppes() && !this->workersLeft() && !this->isWorkerSent(ResourceType::schweppes)) //if there are no workers left and no worker has been sent for the resource- take what's available and client leaves
                {
-                    client->schweppes = this->getSchweppes();
+                    client.schweppes = this->getSchweppes();
                     this->schweppes = 0;
                
                }
@@ -595,7 +624,7 @@ int MyStore::doRequest(Client* client)
               
               if(requestedB > this->getBanana() && !this->workersLeft() && !this->isWorkerSent(ResourceType::banana)) //if there are no workers left and no workers have been sent - take what's available and client leaves
               {
-                  client->banana = this->getBanana();
+                  client.banana = this->getBanana();
                   this->bananas = 0;
               }
               if( requestedB > this-> getBanana() && !this->isWorkerSent(ResourceType::banana)  && this->workersLeft()) //if there is a worker, send them for the resource needed
@@ -615,7 +644,7 @@ int MyStore::doRequest(Client* client)
 
 void MyStore::closeStore()
 {
-  this->emptyClientsVectors();
+  //this->emptyClientsVectors();
   this->clients.clear();
   this->waitingClientsByArrival.clear();
   this->waitingClientsByDeparture.clear();
@@ -634,45 +663,44 @@ void MyStore:: pushClientInLog(int minDepart, int bananas, int schweppes)
     this->clientInLog++;
 }
 
-void MyStore:: popClient(int minute,  Client* client)
+void MyStore:: popClient(int minute,  Client client)
 {
   int firstByA = findFirstNotPopped(this->waitingClientsByArrival);
   int firstByD = findFirstNotPopped(this->waitingClientsByDeparture);
- Client* firstByArrival = this->waitingClientsByArrival[firstByA];
- Client* firstByDeparture = this->waitingClientsByDeparture[firstByD];
+ Client firstByArrival = this->waitingClientsByArrival[firstByA];
+ Client firstByDeparture = this->waitingClientsByDeparture[firstByD];
 
   if(firstByArrival == firstByDeparture && firstByArrival == client )
   {
-    this->waitingClientsByArrival[this->currentFirstInLineArrival]->popped = true;
-    this->waitingClientsByDeparture[this->currentFirstInLineDeparture]->popped = true;
+    this->waitingClientsByArrival[this->currentFirstInLineArrival].popped = true;
+    this->waitingClientsByDeparture[this->currentFirstInLineDeparture].popped = true;
     this->currentFirstInLineArrival++;
     this->currentFirstInLineDeparture++;
   }
   else if ( client == firstByArrival)
   {
-    firstByArrival->popped = true;
+    firstByArrival.popped = true;
     this->currentFirstInLineArrival++;
 
     int idxInDeparture = getClientId(client, this->waitingClientsByDeparture);
-    this->waitingClientsByDeparture[idxInDeparture]->popped = true; //indicates that this client has been removed from the waiting list
+    this->waitingClientsByDeparture[idxInDeparture].popped = true; //indicates that this client has been removed from the waiting list
   }
   else if (client == firstByDeparture)
   {
-    firstByDeparture->popped = true;
+    firstByDeparture.popped = true;
     this->currentFirstInLineDeparture++;
 
     int idxInArrival = getClientId(client,this->waitingClientsByArrival);
-    this->waitingClientsByArrival[idxInArrival]->popped = true;
+    this->waitingClientsByArrival[idxInArrival].popped = true;
 
   } 
 }
-
-int MyStore:: findFirstNotPopped(std::vector<Client*> v)
+int MyStore:: findFirstNotPopped(std::vector<Client> v)
 {
   int size = v.size();
   for(int i=0; i<size;i++)
   {
-    if(!v[i]->popped)
+    if(!v[i].popped)
     {
       return i;
     }
@@ -680,7 +708,7 @@ int MyStore:: findFirstNotPopped(std::vector<Client*> v)
   return -1; //if all are popped
 }
 
-bool MyStore::areAllPopped(std::vector <Client*> v)
+bool MyStore::areAllPopped(std::vector <Client> v)
 {
   return this->findFirstNotPopped(v) == -1;
 }
@@ -718,7 +746,7 @@ void MyStore::onReturn(int minute, const ResourceType rt)
  // this->actionHandler->onWorkerBack(minute, rt);
 }
 
-ResourceType MyStore::higherPriotity(Client* client)
+ResourceType MyStore::higherPriotity(Client client)
 {
   int requestedB = this->requestedBananas(client);
   int requestedS = this->requestedSchweppes(client);
@@ -733,20 +761,23 @@ ResourceType MyStore::higherPriotity(Client* client)
   }
 }
 
-void MyStore::serve(Client* client)
+void MyStore::serve(Client client)
 {
+  std::cout << "v serve, client, pristignal v min " << client.arriveMinute << std::endl;
   int requestedB = this->requestedBananas(client);
   int requestedS = this->requestedBananas(client);
+  std::cout << " v serve banani: " << requestedB << " schweppes: " << requestedS << std::endl;
   
   if ( requestedB <= this->getBanana() && requestedS<= this->getSchweppes())
   {
       this->decreaseBananas(requestedB);
       this->decreaseSchweppes(requestedS);
-      this->popClient(client->arriveMinute, client);
-      this->pushClientInLog(client->arriveMinute, client->banana, client->schweppes);
+      this->popClient(client.arriveMinute, client);
+      this->pushClientInLog(client.arriveMinute, client.banana, client.schweppes);
   }
   else 
   {
+    std::cout << "v serve v else" << std::endl;
       int endMinOfServe = this->doRequest(client);
       
       this->popClient(endMinOfServe,client);
@@ -764,7 +795,7 @@ void MyStore:: generateEvents(const int upToMin)
       ev.client.index =0;
       ev.client.banana = 0;
       ev.client.schweppes = 0;
-      ev.minute = this->clients[0]->maxWaitTime;
+      ev.minute = this->clients[0].maxWaitTime;
       std::cout << ev.minute << " v generate bez rabotnici i edin klient" << std::endl; 
       this->log.push_back(ev);
       this->printLog();
@@ -776,7 +807,7 @@ void MyStore:: generateEvents(const int upToMin)
       ev.client.index =i;
       ev.client.banana = 0;
       ev.client.schweppes = 0;
-      ev.minute = this->clients[i]->maxWaitTime;
+      ev.minute = this->clients[i].maxWaitTime;
       std::cout << ev.minute << " v generate bez rabotnici i mnogo klienti" << std::endl; 
       this->log.push_back(ev);
       this->printLog();
@@ -789,7 +820,7 @@ void MyStore:: generateEvents(const int upToMin)
   }
   else
   {
-     int firstMin  = this->clients[0]->arriveMinute;
+     int firstMin  = this->clients[0].arriveMinute;
      assert(upToMin >= firstMin);
 
       if(this->clientCnt == 1)
@@ -798,19 +829,30 @@ void MyStore:: generateEvents(const int upToMin)
       }
       else
       {
-        for(int i =0; i <= upToMin;i++)
+        int i=0;
+        int jumpTo = this->findMin(this->waitingClientsByArrival, this->waitingClientsByDeparture, this->workersBackTimes);
+        while( i <= upToMin && jumpTo <= upToMin)
         {
           if(!areAllPopped(this->waitingClientsByArrival) || !areAllPopped(this->waitingClientsByDeparture))
           {
-            std::cout << " vlizam na 793" << std::endl;
-            Client* first = this->firstToServe();
+            std::cout << " vlizam na 793 za put " << i << std::endl;
+            Client first = this->firstToServe();
             this->serve(first);
+            std::cout << jumpTo << std::endl;
+            jumpTo = this->findMin(this->waitingClientsByArrival, this->waitingClientsByDeparture, this->workersBackTimes);
+            std::cout << jumpTo << std::endl;
+            i++;
           }
+          else 
+          {
+           return;
+          }
+          
       }   
     }
     
     this->printLog();
-    this->closeStore();
+   // this->closeStore();
 
   }
 }

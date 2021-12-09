@@ -155,19 +155,12 @@ ResourceType higherPriotity(Client client);
 /// Return if there are any workers left in the store
 bool workersLeft();
 
-
-// TODO:funcs
-//TODO: MAKE SOME FUNCTIONS PRIVATE
-
-//TODO: return the first client to be served - take it from isWorkerSent
 /// Returns the first client to be served
 Client firstToServe();
 
-//TODO: look at the first client to be served
 ///Checks if there is already a worker sent that can satisfy the request of the first client to be served
   bool isWorkerSent(const ResourceType rt);
 
-//TODO: make it so that it accepts the first client to be served
 /// Send worker/s for a request,return minute when resource will be enough for the given client
 /// @param client - first client to be served
 int doRequest( Client client);
@@ -177,6 +170,24 @@ void pushClientInLog(int min, int bananas, int schweppes);
 
 /// Serves a client
 void serve(Client client);
+
+
+
+// TODO
+  //funcs
+  //TODO fix close store function
+//TODOMAKE SOME FUNCTIONS PRIVATE
+//TODO overload opetaror == for StoreEvent
+
+
+
+//TODO
+/// Returns if event is already in log
+bool isInLog(const StoreEvent ev);
+
+//TODO
+/// Returns true if last customes has been served - will be used to stop the generation of events
+bool isLastClientServed();
 
 /// Generate all events for the store up to a given minute
   void generateEvents( const int upToMin);
