@@ -187,9 +187,18 @@ void serve(Client* client);
 
 
 
-//TODO
-/// Returns if event is already in log
-bool isInLog(const StoreEvent ev);
+/// Returns the minute of event to occur first
+int firstEventMinute();
+
+///Returns the type of event to happen in a given minute
+/// 0 indicates that a client has arrived
+/// 1 indicates that a client should leave
+/// 2 indicates that a worker will come back
+/// -1 otherwise
+int firstEventInMin(const int minute);
+
+/// Generate event up to given minute
+void generate(const int upTo);
 
 //TODO
 /// Return the minute the request for bananas will be satisfied when sending workers for both resources

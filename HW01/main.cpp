@@ -63,12 +63,12 @@ store->generateEvents(200);//
                                             
 //std::cout << std::boolalpha<< store->areTheFirstsSame() << std::endl;
 //store->printLog();
-//store->emptyClientsVectors();
+store->emptyClientsVectors();
 
 
 //store->incrementBananas();
 //std::cout << store->bananas;
- //delete store;
+ delete store;
 
 
 }

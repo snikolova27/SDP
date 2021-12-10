@@ -1,11 +1,11 @@
 #define CATCH_CONFIG_MAIN
 
 #include "interface.h"
+#include "MyStore.h"
 #include "catch.hpp"
 
 #include <vector>
 
-const int RESTOCK_TIME = 60;
 const int RESTOCK_AMOUNT = 100;
 
 typedef std::vector<Client> ClientList;
@@ -270,6 +270,7 @@ TEST_CASE("Multiple stores")
 	}
 }
 
+/*
 TEST_CASE("Example") 
 {
 	TestStore store;
@@ -465,3 +466,4 @@ TEST_CASE("Clients arrive/depart in mixed order")
 		REQUIRE(LastEvent().client.index == 0);
 	}
 }
+*/
