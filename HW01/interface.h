@@ -33,6 +33,7 @@ struct StoreEvent {
   } client;
   
   StoreEvent(){}
+  friend bool operator ==(const StoreEvent& current, const StoreEvent& other);
 };
 
 /// Interface used to gather all events your solution will generate
