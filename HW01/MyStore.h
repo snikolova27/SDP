@@ -13,6 +13,8 @@ struct MyStore : Store
   int workers = 0;    //will decrease if a worker is sent to bring something, will increase when worker comes back
   int clientCnt = 0;
   int clientInLog = 0;
+  int incomingB = 0;
+  int incomingS = 0;
 
   /// Vector of clients, won't be deleting clients from here
   std::vector<Client*> clients;
@@ -160,16 +162,16 @@ Client* firstToServe();
 
 /// Send worker/s for a request,return minute when resource will be enough for the given client
 /// @param client - first client to be served
-int doRequest( Client* client);
+void doRequest( Client* client);
 
 /// Put client in log
 void pushClientInLog(Client* client, int min, int bananas, int schweppes);
 
 /// Serve bananas to a client, return end minute
-int doRequestBananas( Client* client);
+void doRequestBananas( Client* client);
 
 /// Serve schweppes to a client, return end minute
-int doRequestSchweppes(Client* client);
+void doRequestSchweppes(Client* client);
 
 /// Serves a client
 void serve(Client* client);
@@ -184,8 +186,10 @@ void serve(Client* client);
 
 //TODO: sort the log
 
+void fulfillRequest(Client* client, const int minute);
 
-
+/// Returns if there is a client incoming in this minute
+bool comingClientInMin(const int minute);
 
 /// Returns the minute of event to occur first
 int firstEventMinute();

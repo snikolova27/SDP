@@ -6,6 +6,17 @@ int main()
 {
  MyStore* store = createMyStore();
  store->init(5,0,0);
+ std::cout << store->workers << std::endl;
+ Client cl [] = {Client(0, 10, 0, 10),
+		Client(45, 35, 0, 30),
+		Client(46, 30, 20, 100),
+		Client(200, 10, 10, 1)};
+store->addClients(cl, 4);
+std::cout << store->waitingClientsByArrival.size() << std::endl;
+std::cout << store->requestedBananas(store->waitingClientsByDeparture[0]) << std::endl;
+//store->printClients();
+store->advanceTo(200);//
+store->printLog();
 //readStore(store);
 // Client clients [2];
 //store->workers = 2;
@@ -25,15 +36,7 @@ Client cl4 = Client(2,12,120,70);
 //std::cout << store->waitingClientsByDeparture[0].schweppes << std::endl;
 //std::cout << store->waitingClientsByDeparture[1].arriveMinute << " " << store->waitingClientsByDeparture[1].schweppes << std::endl;
 
-Client cl [] = {Client(0, 10, 0, 10),
-		Client(45, 35, 0, 30),
-		Client(46, 30, 20, 100),
-		Client(200, 10, 10, 1)};
-store->addClients(cl, 4);
-std::cout << store->waitingClientsByArrival.size() << std::endl;
-std::cout << store->requestedBananas(store->waitingClientsByDeparture[0]) << std::endl;
-//store->printClients();
-store->generateEvents(200);//
+
 
 //  std::cout << store->waitingClientsByArrival[store->currentFirstInLineArrival]->maxDepartTime << std::endl;
 //  std::cout << store->waitingClientsByDeparture[0]->arriveMinute << std::endl;
