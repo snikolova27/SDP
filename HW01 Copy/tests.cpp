@@ -270,7 +270,6 @@ TEST_CASE("Multiple stores")
 	}
 }
 
-
 TEST_CASE("Example") 
 {
 	TestStore store;
@@ -341,7 +340,6 @@ TEST_CASE("Example")
 	}
 }
 
-/*
 TEST_CASE("Workers can be sent out only when needed") 
 {
 	TestStore store;
@@ -467,4 +465,3 @@ TEST_CASE("Clients arrive/depart in mixed order")
 		REQUIRE(LastEvent().client.index == 0);
 	}
 }
-*/

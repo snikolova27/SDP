@@ -13,8 +13,6 @@ struct MyStore : Store
   int workers = 0;    //will decrease if a worker is sent to bring something, will increase when worker comes back
   int clientCnt = 0;
   int clientInLog = 0;
-  int incomingB = 0;
-  int incomingS = 0;
 
   /// Vector of clients, won't be deleting clients from here
   std::vector<Client*> clients;
@@ -60,10 +58,7 @@ struct MyStore : Store
   int getClientId(Client* client, std::vector<Client*> v);
 
 ///Return the index of the first non-popped client from a vector v
-int findFirstNotPopped(std::vector <Client*>& v);
-
-/// Return the index of the first client for whom no workers have been send to fulfill their request
-int findFirstNotWaiting(std::vector<Client*>& v);
+  int findFirstNotPopped(std::vector<Client*>& v);
 
 ///Returns if all clients in a vector v are popped == have left
   bool areAllPopped(std::vector <Client*> v);
@@ -149,10 +144,7 @@ int whichResource( Client* client);
   void onReturn(int minute, const ResourceType rt);
 
 /// Remove a client from waiting lists
-  void popClient(Client* client);
-
-/// return index of first client who is not waiting and has not been popped
-int findFirstNotPoppedAndNotWaiting(std::vector<Client *> &v);
+  void popClient(int minute, Client* client);
 
  /// Resource with priotity
 ResourceType higherPriotity(Client* client);
@@ -168,16 +160,16 @@ Client* firstToServe();
 
 /// Send worker/s for a request,return minute when resource will be enough for the given client
 /// @param client - first client to be served
-void doRequest( Client* client);
+int doRequest( Client* client);
 
 /// Put client in log
 void pushClientInLog(Client* client, int min, int bananas, int schweppes);
 
 /// Serve bananas to a client, return end minute
-void doRequestBananas( Client* client);
+int doRequestBananas( Client* client);
 
 /// Serve schweppes to a client, return end minute
-void doRequestSchweppes(Client* client);
+int doRequestSchweppes(Client* client);
 
 /// Serves a client
 void serve(Client* client);
@@ -192,35 +184,18 @@ void serve(Client* client);
 
 //TODO: sort the log
 
-void fulfillRequest(Client* client, const int minute);
 
-/// Returns if there is a client incoming in this minute
-bool comingClientInMin(const int minute);
+
 
 /// Returns the minute of event to occur first
 int firstEventMinute();
 
-///Returns the type of event to happen in a given minute;
-/// 0 indicates that a client has arrived;
-/// 1 indicates that a client should leave;
-/// 2 indicates that a worker will come back;
+///Returns the type of event to happen in a given minute
+/// 0 indicates that a client has arrived
+/// 1 indicates that a client should leave
+/// 2 indicates that a worker will come back
 /// -1 otherwise
-int firstEventInMin(int& jump);
-
-/// Returns if resources will be enough to satistfy client' request
-bool isStockComing(Client* client);
-
-///Return if worker will come back at the given minute
-bool willBeBack(const int minute);
-
-/// Return if stock is enough for client's request
-bool isStockEnough(Client* client);
-
-int findFirstWaiting(std::vector<Client*>& v);
-
-/// Serve clients by arrival up to given minute
-void fulfillRequestsByArrival(const int minute);
-
+int firstEventInMin(const int minute);
 
 /// Generate event up to given minute
 void generate(const int upTo);

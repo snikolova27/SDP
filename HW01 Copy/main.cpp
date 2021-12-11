@@ -5,28 +5,21 @@
 int main()
 {
  MyStore* store = createMyStore();
- store->init(5,0,0);
- std::cout << store->workers << std::endl;
- Client cl [] = {Client(0, 10, 0, 10),
-		Client(45, 35, 0, 30),
-		Client(46, 30, 20, 100),
-		Client(200, 10, 10, 1)};
-store->addClients(cl, 4);
-std::cout << store->waitingClientsByArrival.size() << std::endl;
-std::cout << store->requestedBananas(store->waitingClientsByDeparture[0]) << std::endl;
-//store->printClients();
-store->advanceTo(200);//
-store->printLog();
+ store->init(0,0,0);
+   Client* cl = new Client(0,1,1,1);
+  store->addClient(cl);
+	store->advanceTo(1);
+  store->printLog();
 //readStore(store);
 // Client clients [2];
 //store->workers = 2;
-Client cl1 = Client (0,0,10,65);
- Client cl2 =  Client (2,11,20,75);
+// // Client cl1 = Client (0,0,10,65);
+// //  Client cl2 =  Client (2,11,20,75);
 // clients[0] = cl1;
 // clients[1] = cl2;
 
-Client cl3 = Client(0,10,10,75);
-Client cl4 = Client(2,12,120,70);
+// Client cl3 = Client(0,10,10,75);
+// Client cl4 = Client(2,12,120,70);
 // store->fillWaiting();
 // store->sortWaiting();
 //store->addClients(clients, 2);
@@ -36,7 +29,15 @@ Client cl4 = Client(2,12,120,70);
 //std::cout << store->waitingClientsByDeparture[0].schweppes << std::endl;
 //std::cout << store->waitingClientsByDeparture[1].arriveMinute << " " << store->waitingClientsByDeparture[1].schweppes << std::endl;
 
-
+// // Client cl [] = {Client(0, 10, 0, 10),
+// // 		Client(45, 35, 0, 30),
+// // 		Client(46, 30, 20, 100),
+// // 		Client(200, 10, 10, 1)};
+//store->addClients(cl, 4);
+// std::cout << store->waitingClientsByArrival.size() << std::endl;
+// std::cout << store->requestedBananas(store->waitingClientsByDeparture[0]) << std::endl;
+// //store->printClients();
+// store->generateEvents(200);//
 
 //  std::cout << store->waitingClientsByArrival[store->currentFirstInLineArrival]->maxDepartTime << std::endl;
 //  std::cout << store->waitingClientsByDeparture[0]->arriveMinute << std::endl;
@@ -66,12 +67,12 @@ Client cl4 = Client(2,12,120,70);
                                             
 //std::cout << std::boolalpha<< store->areTheFirstsSame() << std::endl;
 //store->printLog();
-store->emptyClientsVectors();
+//store->emptyClientsVectors();
 
 
 //store->incrementBananas();
 //std::cout << store->bananas;
- delete store;
+ //delete store;
 
 
 }
@@ -116,21 +117,6 @@ store->emptyClientsVectors();
     W 0 scheps
     D 60 banans
     D 60 schewps
-
-
-*/
-/*
-5
-350 100 
-banana
-250 100
-banana
-150 100
-banana
-50 100
-schwepppes
-50 0
-bananna
 
 
 */

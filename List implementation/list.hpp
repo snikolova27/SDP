@@ -353,7 +353,7 @@ public:
 				current = current->prev;
 			}
 
-			current = current->next;
+			current = current->next;0
 		}
 	}
 };
