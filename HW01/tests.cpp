@@ -341,7 +341,7 @@ TEST_CASE("Example")
 	}
 }
 
-/*
+
 TEST_CASE("Workers can be sent out only when needed") 
 {
 	TestStore store;
@@ -397,6 +397,7 @@ TEST_CASE("Workers must not be sent if resource will be available before client 
 	}
 }
 
+
 TEST_CASE("Clients depart and take what they can") 
 {
 	TestStore store;
@@ -424,6 +425,7 @@ TEST_CASE("Clients depart and take what they can")
 		REQUIRE(LastEvent().client.schweppes == 0);
 	}
 }
+
 
 TEST_CASE("Clients arrive/depart in mixed order") 
 {
@@ -467,4 +469,3 @@ TEST_CASE("Clients arrive/depart in mixed order")
 		REQUIRE(LastEvent().client.index == 0);
 	}
 }
-*/

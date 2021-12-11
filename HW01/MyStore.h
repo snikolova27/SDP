@@ -16,6 +16,10 @@ struct MyStore : Store
   int incomingB = 0;
   int incomingS = 0;
 
+  ~MyStore()
+  {
+    this->closeStore();
+  }
   /// Vector of clients, won't be deleting clients from here
   std::vector<Client*> clients;
 
@@ -64,6 +68,12 @@ int findFirstNotPopped(std::vector <Client*>& v);
 
 /// Return the index of the first client for whom no workers have been send to fulfill their request
 int findFirstNotWaiting(std::vector<Client*>& v);
+
+/// Return index of first client who is waiting and has not been popped
+int findFirstNotPoppedAndWaiting(std::vector<Client *> &v);
+
+/// return index of first client who is not waiting and has not been popped
+int findFirstNotPoppedAndNotWaiting(std::vector<Client *> &v);
 
 ///Returns if all clients in a vector v are popped == have left
   bool areAllPopped(std::vector <Client*> v);
@@ -151,8 +161,7 @@ int whichResource( Client* client);
 /// Remove a client from waiting lists
   void popClient(Client* client);
 
-/// return index of first client who is not waiting and has not been popped
-int findFirstNotPoppedAndNotWaiting(std::vector<Client *> &v);
+
 
  /// Resource with priotity
 ResourceType higherPriotity(Client* client);

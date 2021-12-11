@@ -5,23 +5,29 @@
 int main()
 {
  MyStore* store = createMyStore();
- store->init(5,0,0);
+ store->init(5,10,0);
  std::cout << store->workers << std::endl;
  Client cl [] = {Client(0, 10, 0, 10),
 		Client(45, 35, 0, 30),
 		Client(46, 30, 20, 100),
 		Client(200, 10, 10, 1)};
-store->addClients(cl, 4);
-std::cout << store->waitingClientsByArrival.size() << std::endl;
-std::cout << store->requestedBananas(store->waitingClientsByDeparture[0]) << std::endl;
+//store->addClients(cl, 4);
+//std::cout << store->waitingClientsByArrival.size() << std::endl;
+//std::cout << store->requestedBananas(store->waitingClientsByDeparture[0]) << std::endl;
+
+
+Client* cl1 =  new Client (0,0,10,0);
+ Client* cl2 =   new Client (1,20,0,5);
+ store->addClient(cl1);
+ store->addClient(cl2);
+
 //store->printClients();
-store->advanceTo(200);//
+store->advanceTo(6);//
 store->printLog();
 //readStore(store);
 // Client clients [2];
 //store->workers = 2;
-Client cl1 = Client (0,0,10,65);
- Client cl2 =  Client (2,11,20,75);
+
 // clients[0] = cl1;
 // clients[1] = cl2;
 
@@ -72,6 +78,8 @@ store->emptyClientsVectors();
 //store->incrementBananas();
 //std::cout << store->bananas;
  delete store;
+ delete cl1;
+ delete cl2;
 
 
 }
