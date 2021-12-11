@@ -60,7 +60,10 @@ struct MyStore : Store
   int getClientId(Client* client, std::vector<Client*> v);
 
 ///Return the index of the first non-popped client from a vector v
-  int findFirstNotPopped(std::vector<Client*>& v);
+int findFirstNotPopped(std::vector <Client*>& v);
+
+/// Return the index of the first client for whom no workers have been send to fulfill their request
+int findFirstWithNoWorkersSend(std::vector<Client*>& v);
 
 ///Returns if all clients in a vector v are popped == have left
   bool areAllPopped(std::vector <Client*> v);

@@ -74,6 +74,7 @@ struct Client {
   int maxWaitTime;  ///< The max amount of time the client will wait before he departs
   int maxDepartTime; ///< The max minute at which the client will depart
   bool popped;       ///< If a client has left
+  bool hasWorkersSent = false;    ///< If workers have been send for this client's request
 
   Client();
   Client(const Client& other);

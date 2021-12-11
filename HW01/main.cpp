@@ -15,7 +15,7 @@ store->addClients(cl, 4);
 std::cout << store->waitingClientsByArrival.size() << std::endl;
 std::cout << store->requestedBananas(store->waitingClientsByDeparture[0]) << std::endl;
 //store->printClients();
-store->advanceTo(200);//
+//store->advanceTo(200);//
 store->printLog();
 //readStore(store);
 // Client clients [2];
