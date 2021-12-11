@@ -15,6 +15,10 @@ target_link_libraries(ConsoleStore StoreLib)
 add_executable(StoreTests tests.cpp)
 target_link_libraries(StoreTests StoreLib)
 
+# All tests
+add_executable(MyTests  moreTests.cpp)
+target_link_libraries(MyTests StoreLib)
+
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)

@@ -12,14 +12,9 @@ struct MyStore : Store
   int schweppes = 0;
   int workers = 0;    //will decrease if a worker is sent to bring something, will increase when worker comes back
   int clientCnt = 0;
-  int clientInLog = 0;
   int incomingB = 0;
   int incomingS = 0;
-
-  ~MyStore()
-  {
-    this->closeStore();
-  }
+ 
   /// Vector of clients, won't be deleting clients from here
   std::vector<Client*> clients;
 
@@ -46,7 +41,18 @@ struct MyStore : Store
 
   MyStore();
   MyStore(int workers, int banana, int schweppes);
+   ~MyStore()
+  {
+    this->closeStore();
+  }
 
+// ---------------- Log ---------------- 
+
+  /// @brief Prints the log
+  void printLog();
+
+
+// ---------------- Store ---------------- 
 
   virtual void setActionHandler(ActionHandler *handler) override ;
 
@@ -54,216 +60,210 @@ struct MyStore : Store
 
   virtual void advanceTo(int minute) override;
 
-  /// Adds a single client to the store
+  /// @brief Adds a single client to the store
+  /// @param client - client to add
   void addClient( Client* client);
 
-  /// Adds more than one client to the store
+  /// @brief Adds more than one client to the store
+  /// @param clients - vector/array of clients to add
+  /// @param count - count of clients to add
   void addClients(const Client *clients, int count) override;
 
-  /// Return the index of a client in the store, v - vector to search in
-  int getClientId(Client* client, std::vector<Client*> v);
+  /// @brief Generate all events for the store up to a given minute
+  /// @param upToMin - minute
+  void generate(const int upTo);
 
-///Return the index of the first non-popped client from a vector v
-int findFirstNotPopped(std::vector <Client*>& v);
+  /// Clear the vectors of client
+  void closeStore();
 
-/// Return the index of the first client for whom no workers have been send to fulfill their request
-int findFirstNotWaiting(std::vector<Client*>& v);
-
-/// Return index of first client who is waiting and has not been popped
-int findFirstNotPoppedAndWaiting(std::vector<Client *> &v);
-
-/// return index of first client who is not waiting and has not been popped
-int findFirstNotPoppedAndNotWaiting(std::vector<Client *> &v);
-
-///Returns if all clients in a vector v are popped == have left
-  bool areAllPopped(std::vector <Client*> v);
-
- /// Returns current banana quantity in the store
-  virtual int getBanana() const override ;
-
-/// Returns current schweppes quantity in the store
-  virtual int getSchweppes() const override;
-
-
-void printClients();
-
-/// Fills the waitingClients vectors
-void fillWaiting();
-
-/// Find minimum of waitingByArrival, waitingByDeparture, returningWorkers so we know what minute to advance to
-  int findMin( std::vector< Client*>& byDeparture, LinkedQueue<Worker> &workers);
-
-/// Sorts the list of waiting clients by their arrival minute
-  void sortByArrivalMinute(std::vector<Client*>& byArrival);
-
-/// Sorts the list of waiting clients by their max departure minute
-  void sortByDepartureMinute(std::vector<Client*>& byDeparture);
-
-/// Sort the waiting lists
+  ///@brief Sort the waiting lists
   void sortWaiting();
 
-/// Sorts the log by minute of event and i
-/// Uses a lambda function for the sorting
-  void sortByMin(std::vector<StoreEvent > &log);
+  /// @brief Fills the waiting clients vectors
+  void fillWaiting();
 
-/// Prints the log
-  void printLog();
+  /// @brief Returns current banana quantity in the store
+  virtual int getBanana() const override ;
 
-/// Free the memory
-void emptyClientsVectors();
+  /// @brief Returns current schweppes quantity in the store
+  virtual int getSchweppes() const override;
 
-/// Clear the vectors of client
-void closeStore();
+ private:
 
+// ---------------- Checks ---------------- 
 
-///Checks if there are enough bananas available for the request
-  bool areBananasEnough(const int & bananas);
+  /// @brief Returns the type of event to happen in a given minute;
+  /// @param jump - the minute of first event;
+  /// 0 indicates that a client has arrived;
+  /// 1 indicates that a client should leave;
+  /// 2 indicates that a worker will come back;
+  /// -1 otherwise
+  int firstEventInMin(int& jump);
 
-///Checks if there is enough schweppes available for the request
+  /// @brief Returns if resources will be enough to satistfy client's request
+  /// @param client - the client
+  bool isStockComing(Client* client);
+
+  /// @brief Return if worker will come back at the given minute
+  /// @param minute - given minute
+  bool willBeBack(const int minute);
+
+  /// @brief Return if stock is enough for client's request
+  /// @param client - client with request
+  bool isStockEnough(Client* client);
+
+  /// @brief Checks if there is already a worker sent that can satisfy the request of the first client to be served
+  ///@param rt - resource which the worker is sent for
+  bool isWorkerSent(const ResourceType rt);
+
+  /// @brief Return if there are any workers left in the store
+  bool workersLeft();
+
+  /// @brief Returns if all clients in a vector are popped == have left
+  /// @param v - vector to check in
+  bool areAllPopped(std::vector <Client*> v);
+
+   /// @brief Return resource with higher priority
+   /// @param client - client with request
+   ResourceType higherPriotity(Client* client);
+
+   /// @brief Check how many bananas a client wants, returns -1 if they don't want any 
+   /// @param client - client with request 
+   int requestedBananas( Client* client);
+
+   /// @brief Check how much Schweppes a client wants, returns -1 if they don't want any 
+   /// @param client - client with request 
+   int requestedSchweppes( Client* client);
+
+   /// @brief Checks if there are enough bananas available for the request
+   /// @param bananas - bananas in request
+   bool areBananasEnough(const int & bananas);
+
+  /// @brief Checks if there is enough schweppes available for the request
+  /// @param schweppes - schweppes in request
   bool isSchweppesEnough(const int & schweppes);
 
-/// Increment bananas
-  void incrementBananas();
 
-/// Increment schweppes
-  void incrementSchweppes();
+// ---------------- Find ---------------- 
 
-/// Decrease bananas quantity with given amount
-  void decreaseBananas(const int bananas);
+  /// @brief Find the first waiting client
+  /// @param v - vector to search in
+  /// @return index of client
+  int findFirstWaiting(std::vector<Client*>& v);
 
-/// Decrease schweppes quantity with given amount
-  void decreaseSchweppes(const int schweppes);
+  /// @brief Returns the first client to be served
+  Client* firstToServe();
 
-/// Check how many bananas a client wants, returns -1 if they don't want any 
-  int requestedBananas( Client* client);
+  ///@brief Return the index of a client in the store;
+  ///@param v - vector to search in
+  int getClientId(Client* client, std::vector<Client*> v);
 
-/// Check how much Schweppes a client wants, returns -1 if they don't want any 
-  int requestedSchweppes( Client* client);
+  /// @brief Return the index of the first non-popped client from a vector
+  /// @param v - vector to search in
+  int findFirstNotPopped(std::vector <Client*>& v);
 
-/// Checks if there are any workers available
-  bool isWorkerAvailable();
+  /// @brief Return the index of the first client for whom no workers have been send to fulfill their request
+  /// @param v - vector to search in
+  int findFirstNotWaiting(std::vector<Client*>& v);
 
-/// Check if the first by arival and the first by departute are the same
-  bool areTheFirstsSame();
+  /// @brief Return index of first client who is waiting and has not been 
+  /// @param v - vector to search in 
+  int findFirstNotPoppedAndWaiting(std::vector<Client *> &v);
 
-///Find which client arrived first
- Client* findFirstOfTwo(Client* first,  Client* second);
+  /// @brief Return index of first client who is not waiting and has not been popped
+  /// @param v - vector to search in
+  int findFirstNotPoppedAndNotWaiting(std::vector<Client *> &v);
 
-/// Returns which resource a client wants  - returns 0 for bananas, 1 for schweppes, 2 for both, -1 if not valid
-int whichResource( Client* client);
 
-/// Send a worker for the given resource
+// ---------------- Do requests ---------------- 
+
+  /// @brief Serve clients by arrival up to given minute
+  /// @param minute - given minute
+  void fulfillRequestsByArrival(const int minute);
+
+  /// @brief Serve client with what's available at given minute
+  /// @param client - client to serve
+  /// @param minute - guven minute
+  void fulfillRequest(Client* client, const int minute);
+
+  /// @brief Serve bananas to a client
+  /// @param client - client to serve
+  void doRequestBananas( Client* client);
+
+  /// @brief Serve schweppes to a client
+  /// @param client - client to serve
+  void doRequestSchweppes(Client* client);
+
+
+  // ---------------- Log ---------------- 
+
+  /// @brief Push client into log
+  /// @param client - client to push
+  /// @param min - minute of departure of client
+  /// @param bananas - amount of bananas the client is leaving with
+  /// @param schweppes - amount of schweppes the client is leaving with
+  void pushClientInLog(Client* client, int min, int bananas, int schweppes);
+
+  /// @brief Send a worker for the given resource
+  /// @param minute - minute to send the worker at
+  /// @param rt - respurce to send the worker for
   void sendWorker(int minute, const ResourceType rt);
 
-/// Worker comes back
+  /// @brief Worker comes back with resource
+  /// @param minute - minute at which the worker returns
+  /// @param rt - resource which the worker brings
   void onReturn(int minute, const ResourceType rt);
 
-/// Remove a client from waiting lists
+  /// @brief Client departs and is removed from waiting lists
+  /// @param client - client to remove
   void popClient(Client* client);
 
 
+  // ---------------- Store ---------------- 
 
- /// Resource with priotity
-ResourceType higherPriotity(Client* client);
+  /// @brief Free the memory
+  void emptyClientsVectors();
 
-/// Return if there are any workers left in the store
-bool workersLeft();
+  /// @brief Increment bananas with 100
+  void incrementBananas();
 
-/// Returns the first client to be served
-Client* firstToServe();
+  /// @brief Increment schweppes with 100
+  void incrementSchweppes();
 
-///Checks if there is already a worker sent that can satisfy the request of the first client to be served
-  bool isWorkerSent(const ResourceType rt);
+  /// @brief Decrease bananas quantity with given amount
+  /// @param bananas - amount to decrease with
+  void decreaseBananas(const int bananas);
 
-/// Send worker/s for a request,return minute when resource will be enough for the given client
-/// @param client - first client to be served
-void doRequest( Client* client);
+  /// Decrease schweppes quantity with given amount
+  /// @param schweppes - amount to decrease with
+  void decreaseSchweppes(const int schweppes);
 
-/// Put client in log
-void pushClientInLog(Client* client, int min, int bananas, int schweppes);
-
-/// Serve bananas to a client, return end minute
-void doRequestBananas( Client* client);
-
-/// Serve schweppes to a client, return end minute
-void doRequestSchweppes(Client* client);
-
-/// Serves a client
-void serve(Client* client);
-
-
-
-// TODO
-  //funcs
-  //TODO fix close store function
-//TODOMAKE SOME FUNCTIONS PRIVATE
-//TODO overload opetaror == for StoreEvent
-
-//TODO: sort the log
-
-void fulfillRequest(Client* client, const int minute);
-
-/// Returns if there is a client incoming in this minute
-bool comingClientInMin(const int minute);
-
-/// Returns the minute of event to occur first
-int firstEventMinute();
-
-///Returns the type of event to happen in a given minute;
-/// 0 indicates that a client has arrived;
-/// 1 indicates that a client should leave;
-/// 2 indicates that a worker will come back;
-/// -1 otherwise
-int firstEventInMin(int& jump);
-
-/// Returns if resources will be enough to satistfy client' request
-bool isStockComing(Client* client);
-
-///Return if worker will come back at the given minute
-bool willBeBack(const int minute);
-
-/// Return if stock is enough for client's request
-bool isStockEnough(Client* client);
-
-int findFirstWaiting(std::vector<Client*>& v);
-
-/// Serve clients by arrival up to given minute
-void fulfillRequestsByArrival(const int minute);
-
-
-/// Generate event up to given minute
-void generate(const int upTo);
-
-//TODO
-/// Return the minute the request for bananas will be satisfied when sending workers for both resources
-int doBananas (Client* client, int& endBananas);
-
-///
-int doSchweppes(Client* client, int& endSchweppes);
-
-/// Generate all events for the store up to a given minute
-  void generateEvents( const int upToMin);
+  /// @brief Sorts the vector of waiting clients by their max departure minute
+  /// @param byDeparture - vector to sort
+  void sortByDepartureMinute(std::vector<Client*>& byDeparture);
 };
 
 
-/// Done
-
-/// Creates a new MyStore
+/// @brief Creates a new MyStore
+/// @return new MyStore
 MyStore* createMyStore();
 
-/// Reads information about the store
+/// @brief Reads information about the store from the console
+/// @param store - the store to read information about
 void readStore(MyStore* store);
 
-/// Returns a string equal to the ResourceType
+/// @brief  Returns a string equal to the ResourceType
+/// @param rt - resource
 std::string getResourceToString(const ResourceType &rt);
 
-/// Checks if input is valid, if not - throws an exception
+/// @brief Checks if input is valid, if not - throws an exception
 void checkInput();
 
-/// Reads information about a client and return a client with such information
+/// @brief Reads information about a client from the console
+/// @return client with such information
 Client* readClient();
 
- ///Copies vector of clients to another vector of clients
+ /// @brief Copies vector of clients to another vector of clients
+ /// @param source - the source vector
+ /// @param dest - the destination vector
 void copyClients(std::vector<Client>  source, std::vector< Client>& dest);
-
-
