@@ -1196,7 +1196,7 @@ void MyStore:: generate(const int upTo)
         {
           std::cout << departMin << std::endl;
           this->pushClientInLog(this->clients[i], departMin, finalB, finalS);
-          this->clients[i].hasWorkerSent
+          this->clients[i].hasWorkerSent`
           this->popClient(departMin,this->clients[i]);
         }
       }
