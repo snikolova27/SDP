@@ -155,8 +155,14 @@ int Hierarchy::num_overloaded(int level) const
   return cnt;
 }
 
+  int Hierarchy::dfsl(const int id) const
+  {
+    int m = 0;
+    for (int sub : this->subs[id]) m = std::max(m, dfsl(sub));
+    return m + 1;
+  }
+
  int Hierarchy::longest_chain() const
  {
-    int res = 0;
-    return res;
+    return dfsl(0);
  }

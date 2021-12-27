@@ -45,4 +45,7 @@ private:
     int cnt_all_subs(const int id) const;
 
     int cnt_non_direct_subordinates(const int id) const;
+
+    int dfsl(const int id) const;
+
 };
