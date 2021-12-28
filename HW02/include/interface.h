@@ -9,13 +9,12 @@ const int SALARY_PER_NON_DIRECT_SUB = 50;
 class Hierarchy
 {
 public:
-    Hierarchy(Hierarchy&& r) noexcept;
-    Hierarchy(const Hierarchy& r);
-    Hierarchy(const string& data);
-    ~Hierarchy() noexcept;
+    // Hierarchy(Hierarchy&& r) noexcept;
+    // Hierarchy(const Hierarchy& r);
+    // Hierarchy(const string& data);
+    // ~Hierarchy() noexcept;
     void operator=(const Hierarchy&) = delete;
 
-    //TODO
     string print() const;
 
     int longest_chain() const;
@@ -68,14 +67,23 @@ private:
     /// @brief Return a vector with the indices of employees with highest salaries
     std::vector <int> get_vector_employees_id_highest_salary (const std::vector <int>& employees) const;
 
-    /// @brief Return the index of the lexicographically smallest employee in given vector of employees
+    /// @brief Return the index of the lexicographically smallest employee in given vector of employees from a given position
     /// @return -1 if not valid, otherwise valid index
-    int smallest_employee(const std::vector <int>& employees) const;
+    int smallest_employee_from(const int from, const std::vector <int>& employees) const;
 
     /// @brief Remove the employee from all their managers
     void remove_connection(const int id_to_remove);
 
     /// @brief Used to evade code repetition
     void incorporate_helper(const int index, const int size, const std::vector<int>& v);
+
+    ///@brief Return name of employee by given index, if index is not valid - throws an exception
+    string get_name_by_idx(const int idx) const;
+
+    ///@brief Helper function for the main print function - works for one employee at a time
+    string print_subs_of ( const int idx) const;
+
+    ///@brief Get the ids of managers who are on uneven levels
+    std::vector<int> uneven_levels_teams() const;
 
 };

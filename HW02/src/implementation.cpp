@@ -1,12 +1,68 @@
+#include "input.h"
 #include "interface.h"
 
 #include <algorithm>
 #include <exception>
+#include <numeric>
 #include <stdexcept>
 
-string Hierarchy::print() const 
+
+string Hierarchy::get_name_by_idx(const int idx) const
+{
+  if ( idx >= this->employees.size() || idx < 0)
   {
-     return "water sheep"; 
+    throw std::invalid_argument("Invalid index");
+  }
+  return this->employees[idx];
+}
+
+string Hierarchy::print_subs_of ( const int idx) const
+{
+  if( idx >= this->employees.size() || idx < 0)
+  {
+     throw std::invalid_argument("Invalid index");
+  }
+  string res = "";
+  const int current_size = this->subs[idx].size();
+  std::vector<string> current_names;
+  for( int k = 0; k < current_size; k++)
+   {
+      current_names.emplace_back(this->employees[this->subs[idx][k]]);
+   }
+  std::sort(current_names.begin(), current_names.end());
+
+  for( int k = 0; k < current_size; k++)
+   {
+     res = res + this->get_name_by_idx(idx) + " - " + current_names[k] + "\n";
+   }
+
+return res;
+}
+
+string Hierarchy::print() const 
+{
+    string res = "";
+    const int size = this->employees.size();
+    const std::vector<string> & names = this->employees;
+
+    std::vector<int> sorted_ids(names.size() - 1); // Without the boss
+    for ( int j = 1; j < size ; j++ ) 
+    {
+      sorted_ids.emplace_back(j);
+    }
+   // std::iota(sorted_ids.begin(), sorted_ids.end(), 1); 
+    std::sort(sorted_ids.begin(), sorted_ids.end(), [&](int a, int b) { return names[a] < names[b]; });
+
+    //print the subordinmtes of the Boss
+    res += this->print_subs_of(0);
+
+    // print the subordinates of the rest of the employees
+    for ( int i = 0; i < size - 1; i++)
+    {
+     res += this->print_subs_of(sorted_ids[i]);
+    }
+
+    return res;
   }
 
 int Hierarchy::num_employees() const 
@@ -262,7 +318,28 @@ std::vector <int> Hierarchy::get_vector_employees_id_highest_salary (const std::
     return res;
 }
 
-int Hierarchy::smallest_employee(const std::vector <int>& employees) const
+// int Hierarchy::smallest_employee(const std::vector <int>& employees) const
+// {
+//   const int size = employees.size();
+//   if ( size == 0)
+//   {
+//     return -1; //empty vector
+//   }
+
+//   string current_smallest = this->employees[employees[0]];
+//   int smallest_id = -1;
+//   for (int i = 1; i < size ; i++)
+//   {
+//     if (this->employees[employees[i]] < current_smallest)
+//     {
+//       current_smallest = this->employees[employees[i]];
+//       smallest_id = employees[i];
+//     }
+//   }
+//   return smallest_id;
+// }
+
+int Hierarchy::smallest_employee_from(const int from, const std::vector <int>& employees) const
 {
   const int size = employees.size();
   if ( size == 0)
@@ -270,9 +347,9 @@ int Hierarchy::smallest_employee(const std::vector <int>& employees) const
     return -1; //empty vector
   }
 
-  string current_smallest = this->employees[employees[0]];
+  string current_smallest = this->employees[employees[from]];
   int smallest_id = -1;
-  for (int i = 1; i < size ; i++)
+  for (int i = from + 1; i < size ; i++)
   {
     if (this->employees[employees[i]] < current_smallest)
     {
@@ -333,7 +410,7 @@ void Hierarchy::incorporate()
         std::vector <int> max_salaries_ids = get_vector_employees_id_highest_salary(s);
         if(!max_salaries_ids.empty())
         {
-          const int smallest_emp_id = smallest_employee(max_salaries_ids); //find lexicographically smallest employee with the highest salary
+          const int smallest_emp_id = smallest_employee_from(0,max_salaries_ids); //find lexicographically smallest employee with the highest salary
           if( smallest_emp_id != -1)
           {
             this->incorporate_helper(smallest_emp_id , current_subs, s);
@@ -369,4 +446,26 @@ void Hierarchy::incorporate()
       //     }
     }
   } 
+}
+
+
+std::vector<int> Hierarchy::uneven_levels_teams() const
+{
+  const int size = this->employees.size();
+  std::vector <int> uneven;
+  for (int i = 0; i < size; i++)
+  {
+    const auto & s = this->subs[i];
+    if( i % 2 != 0 && s.size() > 0)
+    {
+      uneven.emplace_back(i);
+    }
+  }
+  return uneven;
+  
+}
+
+void  Hierarchy::modernize()
+{
+
 }
