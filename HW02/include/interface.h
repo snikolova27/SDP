@@ -9,10 +9,10 @@ const int SALARY_PER_NON_DIRECT_SUB = 50;
 class Hierarchy
 {
 public:
-    // Hierarchy(Hierarchy&& r) noexcept;
-    // Hierarchy(const Hierarchy& r);
-    // Hierarchy(const string& data);
-    // ~Hierarchy() noexcept;
+    Hierarchy(Hierarchy&& r) noexcept = default;
+    Hierarchy(const Hierarchy& r) = default;
+    Hierarchy(const string& data);
+    ~Hierarchy() noexcept = default;
     void operator=(const Hierarchy&) = delete;
 
     string print() const;
@@ -77,6 +77,9 @@ private:
     /// @brief Used to evade code repetition
     void incorporate_helper(const int index, const int size, const std::vector<int>& v);
 
+    /// @brief Change the manager of an employee
+    void reasign_manager(const int idx_emp, const int idx_new_manager);
+
     ///@brief Return name of employee by given index, if index is not valid - throws an exception
     string get_name_by_idx(const int idx) const;
 
@@ -85,5 +88,7 @@ private:
 
     ///@brief Get the ids of managers who are on uneven levels
     std::vector<int> uneven_levels_teams() const;
+
+    void read_one_line() const;
 
 };

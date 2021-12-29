@@ -1,11 +1,54 @@
-#include "input.h"
 #include "interface.h"
 
 #include <algorithm>
-#include <exception>
-#include <numeric>
+#include <sstream>
 #include <stdexcept>
+#include <string>
+#include <iostream>
 
+void Hierarchy::read_one_line() const
+{
+
+}
+
+Hierarchy::Hierarchy(const string& data)
+{
+  std::istringstream ss(data);
+  std::string line;
+  while (std::getline(ss, line))
+  {
+    const auto dashIdx = line.find('-');
+    if (dashIdx == line.npos) continue;
+    line[dashIdx] = ' ';
+
+    std::istringstream ss2(line);
+    std::string man, sub;
+    if (!(ss2 >> man >> sub))
+    {
+      // stuff
+      continue;
+    }
+
+    if (this->employees.empty())
+    {
+      this->employees.emplace_back(man);
+      // this->employees.emplace_back(sub);
+      this->subs.emplace_back();
+      // this->subs.emplace_back();
+      // this->subs[0].emplace_back(1);
+      std::cout << this->employees.size()  << std::endl;
+      //this->subs.emplace_back(0);
+      std::cout << this->subs.size()  << std::endl;
+     // this->subs[0].emplace_back();
+      std::cout <<this->subs[0].size() << std::endl;
+      //hire(sub,man);
+    }
+  
+  
+   hire(sub, man);
+   
+  }
+}
 
 string Hierarchy::get_name_by_idx(const int idx) const
 {
@@ -43,6 +86,11 @@ string Hierarchy::print() const
 {
     string res = "";
     const int size = this->employees.size();
+    if(size <= 0)
+    {
+      return res;
+    }
+
     const std::vector<string> & names = this->employees;
 
     std::vector<int> sorted_ids(names.size() - 1); // Without the boss
@@ -99,6 +147,7 @@ bool Hierarchy::hire(const string &who, const string &boss)
 
   const int emp_id = this->employees.size();    //new employee id
   this->employees.emplace_back(who);
+  std::cout << "In hire " << this->employees[emp_id] << std::endl;
   this->subs.emplace_back();    // create an empty vector for the subordinates of the new employee
   this->subs[boss_id].emplace_back(emp_id);
   return true;
@@ -151,6 +200,11 @@ int Hierarchy ::find_manager(const std::string& name) const
   {
     return -1; // invalid employee id
   }
+ 
+  if(emp_id == 0)
+  {
+    return 0; // the Boss does not have a manager
+  }
 
   const int size = this->subs.size();
   for (int i = 0; i < size; i++)
@@ -163,19 +217,6 @@ int Hierarchy ::find_manager(const std::string& name) const
     }
   }
   return -1; // Nobody is the boss of him
-  
-  // for (int i = 0; i < size; i++)
-  // {
-  //   int innerSize = this->subs[i].size();
-  //   for( int j = 0; j < innerSize; j++)
-  //   {
-  //      if(emp_id ==  this->subs[i][j])
-  //      {
-  //        return i;
-  //      }`
-  //   }
-  // }
-  // return -1; // manager was not found
 }
 
  string Hierarchy::manager(const string& name) const
@@ -184,6 +225,10 @@ int Hierarchy ::find_manager(const std::string& name) const
    if (manager_id < 0)
    {
      throw std::invalid_argument("No manager");
+   }
+   if ( manager_id == 0)
+   {
+     return "";
    }
    return this->employees[manager_id];
  }
@@ -241,7 +286,7 @@ int Hierarchy::num_overloaded(int level) const
   return cnt;
 }
 
-  int Hierarchy::dfsl(const int id) const
+int Hierarchy::dfsl(const int id) const
   {
     int m = 0;
     for (int sub : this->subs[id])
@@ -253,6 +298,7 @@ int Hierarchy::num_overloaded(int level) const
 
 int Hierarchy::longest_chain() const
  {
+   if (employees.empty()) return 0;
     return dfsl(0);
  }
 
@@ -396,6 +442,30 @@ void Hierarchy::incorporate_helper(const int index, const int size, const std::v
           }
 }
 
+void Hierarchy::reasign_manager(const int idx_emp, const int idx_new_manager)
+{
+  const int current_manager = this->find_manager(this->get_name_by_idx(idx_emp)); //get the current manager
+  if( current_manager == -1 ||  current_manager == 0)
+  {
+    throw std::invalid_argument ("There is not a valid current manager");
+  }
+
+  // remove employee from current manager
+
+  // find position in the vector of employees of the current manager
+  const auto pos = std::find(this->subs[current_manager].begin(), this->subs[current_manager].end(), idx_emp);
+  if ( pos == this->subs[current_manager].end())
+  {
+    throw std::invalid_argument("Employee not found");
+  }
+  this->subs[current_manager].erase(pos);
+
+  // add employee to new manager
+  this->subs[idx_new_manager].emplace_back(idx_emp);
+  
+}
+
+
 void Hierarchy::incorporate()
 {
   const int starting_teams = this->subs.size();
@@ -468,4 +538,9 @@ std::vector<int> Hierarchy::uneven_levels_teams() const
 void  Hierarchy::modernize()
 {
 
+}
+
+Hierarchy Hierarchy::join(const Hierarchy& right) const
+{
+  return *this;
 }

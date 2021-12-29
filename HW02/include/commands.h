@@ -1,21 +1,33 @@
 #pragma once
+#include "interface.h"
+#include "commandTokenizer.h"
+#include <iostream>
 #include <string>
 #include <vector>
 
 class FileCommands
 {
-    private:
+    public:
     std::string object_name;
     std::string file_name;
-    public:
-    FileCommands(std::string& obj, std::string& file) : object_name(obj), file_name(file){};
-    const std::string& get_object_name () const;
-    const std::string& get_file_name() const;
+  //  FileCommands();
+   // FileCommands( const std::vector <std::string>& args);
+   // FileCommands(std::string& obj, std::string& file) : object_name(obj), file_name(file){};
+    virtual const std::string& get_object_name () const;
+    virtual const std::string& get_file_name() const;
 };
 
-class LoadCommand : public FileCommands {};
+class LoadCommand : public FileCommands
+{
+    public:
+    LoadCommand (const std::vector <std::string>& args) ;
+};
 
-class SaveCommand : public FileCommands {};
+class SaveCommand : public FileCommands
+{
+    public:
+    SaveCommand(const std::vector <std::string>& args);
+};
 
 class EmployeeCommands
 {
@@ -83,3 +95,28 @@ class HireCommand
     const std::string& get_manager_name() const;
 };
 
+class CommandProcessor
+{
+    private:
+    Hierarchy& h;
+
+    void process_save_command(const SaveCommand& cmd);
+    void process_load_command(const LoadCommand& cmd);
+    void process_find_command(const FindCommand& cmd);
+    void process_subordinates_command(const SubordinatesCommand& cmd);
+    void process_manager_command(const ManagerCommand& cmd);
+    void process_fire_command(const FireCommand& cmd);
+    void process_salary_command(const SalaryCommand& cmd);
+    void process_employees_command(const NumEmployeesCommand& cmd);
+    void process_overloaded_command(const OverloadedCommand& cmd);
+    void process_incorporate_command(const IncorporateCommand& cmd);
+    void process_modernize_command(const ModernizeCommand& cmd);
+    void process_join_command(const JoinCommand& cmd);
+    void process_hire_command(const HireCommand& cmd);
+    
+    public:
+    CommandProcessor(Hierarchy& h) : h(h) {};
+    void process_command(const std::string& cmd_str);
+    void help( std::ostream & stream);
+    void exit();
+};
