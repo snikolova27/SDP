@@ -151,21 +151,20 @@ bool Hierarchy::fire(const string& who)
     this->subs[manager_id].emplace_back(to_insert);
   }
 
-  this->subs.erase(this->subs.begin() + id);
+  for (auto & s : this->subs)
+  {
+    int dst = 0;
+    int src = 0;
+    for (; src < s.size(); src++)
+    {
+      const int curr = s[src];
+      if (curr == id) continue;
+      s[dst++] = curr > id ? curr - 1 : curr;
+    }
+    if (dst < src) s.erase(s.end() - 1);
+  }
   this->employees.erase(this->employees.begin() + id);
 
-  const int size = this->subs.size();
-  for ( int i = 0; i < size; i++)
-  {
-      const int inner_size = this->subs[i].size();
-      for( int k = 0; k < inner_size; k++)
-      {
-         if(id > this->subs[i][k])
-         {
-           this->subs[i][k]-=1;
-         }
-      }
-  }
   return true;
 }
 
