@@ -83,12 +83,8 @@ private:
     ///@brief Return name of employee by given index, if index is not valid - throws an exception
     string get_name_by_idx(const int idx) const;
 
-    ///@brief Helper function for the main print function - works for one employee at a time
-    string print_subs_of ( const int idx) const;
-
     ///@brief Get the ids of managers who are on uneven levels
     std::vector<int> uneven_levels_teams() const;
 
-    void read_one_line() const;
 
 };

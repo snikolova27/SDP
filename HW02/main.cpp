@@ -17,6 +17,6 @@ int main()
     "Slav1     - Mecho \n"
     "Mecho     - Q12Adl\n";
     Hierarchy h(lozenec);
-    h.print();
+    std::cout << h.print();
     return 0;
 }

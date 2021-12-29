@@ -1,3 +1,4 @@
+#include "input.h"
 #include "interface.h"
 
 #include <algorithm>
@@ -5,11 +6,8 @@
 #include <stdexcept>
 #include <string>
 #include <iostream>
-
-void Hierarchy::read_one_line() const
-{
-
-}
+#include <numeric>
+#include <queue>
 
 Hierarchy::Hierarchy(const string& data)
 {
@@ -18,7 +16,10 @@ Hierarchy::Hierarchy(const string& data)
   while (std::getline(ss, line))
   {
     const auto dashIdx = line.find('-');
-    if (dashIdx == line.npos) continue;
+    if (dashIdx == line.npos) 
+    {
+      throw std::invalid_argument("No dash present");
+    }
     line[dashIdx] = ' ';
 
     std::istringstream ss2(line);
@@ -32,21 +33,12 @@ Hierarchy::Hierarchy(const string& data)
     if (this->employees.empty())
     {
       this->employees.emplace_back(man);
-      // this->employees.emplace_back(sub);
       this->subs.emplace_back();
-      // this->subs.emplace_back();
-      // this->subs[0].emplace_back(1);
-      std::cout << this->employees.size()  << std::endl;
-      //this->subs.emplace_back(0);
-      std::cout << this->subs.size()  << std::endl;
-     // this->subs[0].emplace_back();
-      std::cout <<this->subs[0].size() << std::endl;
-      //hire(sub,man);
     }
-  
-  
-   hire(sub, man);
-   
+    if(!hire(sub,man))
+    {
+      throw std::invalid_argument("Boss hasn't been hired");
+    }   
   }
 }
 
@@ -59,58 +51,42 @@ string Hierarchy::get_name_by_idx(const int idx) const
   return this->employees[idx];
 }
 
-string Hierarchy::print_subs_of ( const int idx) const
-{
-  if( idx >= this->employees.size() || idx < 0)
-  {
-     throw std::invalid_argument("Invalid index");
-  }
-  string res = "";
-  const int current_size = this->subs[idx].size();
-  std::vector<string> current_names;
-  for( int k = 0; k < current_size; k++)
-   {
-      current_names.emplace_back(this->employees[this->subs[idx][k]]);
-   }
-  std::sort(current_names.begin(), current_names.end());
-
-  for( int k = 0; k < current_size; k++)
-   {
-     res = res + this->get_name_by_idx(idx) + " - " + current_names[k] + "\n";
-   }
-
-return res;
-}
-
 string Hierarchy::print() const 
 {
-    string res = "";
     const int size = this->employees.size();
     if(size <= 0)
     {
-      return res;
+      return "";
     }
 
     const std::vector<string> & names = this->employees;
 
-    std::vector<int> sorted_ids(names.size() - 1); // Without the boss
-    for ( int j = 1; j < size ; j++ ) 
+    std::stringstream ss;
+
+    struct Line
     {
-      sorted_ids.emplace_back(j);
-    }
-   // std::iota(sorted_ids.begin(), sorted_ids.end(), 1); 
-    std::sort(sorted_ids.begin(), sorted_ids.end(), [&](int a, int b) { return names[a] < names[b]; });
+      int man, sub;
+    };
 
-    //print the subordinmtes of the Boss
-    res += this->print_subs_of(0);
+    std::queue<Line> printQ;
 
-    // print the subordinates of the rest of the employees
-    for ( int i = 0; i < size - 1; i++)
+    auto push_subs = [&](const int id)
     {
-     res += this->print_subs_of(sorted_ids[i]);
+      auto subs = this->subs[id];
+      std::sort(subs.begin(), subs.end(), [&](int a, int b) { return names[a] < names[b]; });
+      for (int sid : subs) printQ.emplace<Line>({id, sid});
+    };
+
+    push_subs(0);
+    while (!printQ.empty())
+    {
+      const auto curr = printQ.front();
+      printQ.pop();
+      ss << names[curr.man] << "-" << names[curr.sub] << "\n";
+      push_subs(curr.sub);
     }
 
-    return res;
+    return ss.str();    
   }
 
 int Hierarchy::num_employees() const 
@@ -136,18 +112,19 @@ int Hierarchy::find_id(const std::string &name) const
 bool Hierarchy::hire(const string &who, const string &boss) 
 {
   const int boss_id = find_id(boss);
+  const int orig_emp_id = find_id(who);
   if (boss_id < 0)  // invalid boss name
   {
     return false;
   } 
-  if (find(who))  //would mean that the person is already hired
+  if (orig_emp_id != -1)  //would mean that the person is already hired
   {
-    return false;
+    this->reasign_manager(orig_emp_id, boss_id);
+    return true;
   } 
 
   const int emp_id = this->employees.size();    //new employee id
   this->employees.emplace_back(who);
-  std::cout << "In hire " << this->employees[emp_id] << std::endl;
   this->subs.emplace_back();    // create an empty vector for the subordinates of the new employee
   this->subs[boss_id].emplace_back(emp_id);
   return true;
@@ -222,11 +199,16 @@ int Hierarchy ::find_manager(const std::string& name) const
  string Hierarchy::manager(const string& name) const
  {
    const int manager_id = find_manager(name);
+   const int emp_id = find_id(name);
    if (manager_id < 0)
    {
      throw std::invalid_argument("No manager");
    }
-   if ( manager_id == 0)
+   if ( manager_id == 0 && emp_id != 0)
+   {
+     return TheBoss;
+   }
+   if ( emp_id == 0)
    {
      return "";
    }
