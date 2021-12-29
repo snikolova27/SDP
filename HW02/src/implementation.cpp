@@ -151,6 +151,8 @@ bool Hierarchy::fire(const string& who)
     this->subs[manager_id].emplace_back(to_insert);
   }
 
+  this->subs.erase(this->subs.begin() +id);
+
   for (auto & s : this->subs)
   {
     int dst = 0;
@@ -164,7 +166,7 @@ bool Hierarchy::fire(const string& who)
     if (dst < src) s.erase(s.end() - 1);
   }
   this->employees.erase(this->employees.begin() + id);
-
+  
   return true;
 }
 
