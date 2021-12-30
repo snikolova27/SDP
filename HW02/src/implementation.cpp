@@ -462,6 +462,67 @@ int Hierarchy::find_level_employee(const int idx) const
   return -1;
  
 }
+std::vector<int> Hierarchy::get_emp_with_manager(const int& idx) const
+{
+  std::vector <int> result;
+  const int size = this->employees.size();
+  
+  for (int i = 0; i < size; i++)
+  {
+    const int man_idx = find_manager(this->employees[i]);
+    if( man_idx == idx)
+    {
+      result.emplace_back(i);
+    }
+  }
+
+  return result;
+}
+
+std::vector<Team> Hierarchy::teams_at(const int& level) const
+{
+  std::vector<Team> result;
+  if ( level > this->longest_chain())
+  {
+    throw std::invalid_argument("Invalid level index");
+  }
+
+  const int size = this->employees.size();
+  std::vector<bool> managers(size,true);
+
+  for( int i = 0; i < size; i++)
+  {
+      if( this->find_level_employee(i) == level)
+      {
+       const int man_idx = find_manager(this->employees[i]);
+       
+       if (managers[man_idx]) //would mean that we haven't created the teams of this manager
+       {
+         std::vector<int> team_mates = get_emp_with_manager(man_idx);
+         Team current= Team(team_mates);
+         current.set_manager(man_idx);
+         result.emplace_back(current);
+
+         managers[man_idx] = false;
+       }      
+      }
+  }
+
+  return result;
+}
+
+
+std::vector<std::vector<Team>> Hierarchy::get_teams() const
+{
+  std::vector<std::vector<Team>> result;
+  const int deepest_level = this->longest_chain() - 1;
+  for( int i = deepest_level; i >= 0; i++)
+  {
+
+  }
+
+  return result;
+}
 
 
 void Hierarchy::incorporate()

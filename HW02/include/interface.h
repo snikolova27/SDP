@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "team.h"
 
 using std::string;
 const int SALARY_PER_DIRECT_SUB = 500;
@@ -90,6 +91,16 @@ private:
 
     ///@brief Return name of employee by given index, if index is not valid - throws an exception
     string get_name_by_idx(const int idx) const;
+
+public:
+    /// @brief Returns the teams on a given level
+    std::vector<Team> teams_at(const int& level) const;
+
+    ///@brief Return a vector of teams on different levels
+    std::vector<std::vector<Team>> get_teams() const;
+
+    /// @brief Return the employees with given manager
+    std::vector<int> get_emp_with_manager(const int& idx) const;
 
 
 };
