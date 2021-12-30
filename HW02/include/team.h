@@ -5,10 +5,11 @@
  struct Team
  {
      private:
-     std::vector<int> team_mates;
-     int manager;
      
+     int manager;
+
      public:
+     std::vector<int> team_mates;
      Team();
      Team(std::vector <int>& mates);
      void add_mate(const int& mate_idx);

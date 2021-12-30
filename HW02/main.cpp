@@ -37,8 +37,10 @@ int main()
    
     }
    // teams[0][0].print(); 
-    std::cout << h.get_emp_with_greatest_salary(teams[2][0]) << std::endl;
-    std::cout << h.get_name_by_idx(h.get_emp_with_greatest_salary(teams[2][0])) << std::endl;
+    std::cout << h.get_emp_with_greatest_salary(teams[3][1]) << std::endl;
+    //std::cout << h.get_name_by_idx(h.get_emp_with_greatest_salary(teams[3][1])) << std::endl;
+    std::cout << h.get_smallest_emp(teams[3][1]) << std::endl;
+    std::cout <<h.get_name_by_idx(  h.get_smallest_emp(teams[3][1])) << std::endl;
     // std::cout << h.find_level_employee(12) << std::endl;
     // std::cout << h.get_name_by_idx(12) << std::endl;
    // std::cout << h.print();

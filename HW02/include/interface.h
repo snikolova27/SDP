@@ -107,4 +107,6 @@ public:
     /// @brief Return the index of the employee with highest salary in a team, -1 if no such employee exist
     int get_emp_with_greatest_salary(const Team& team) const;
 
+    int get_smallest_emp(const Team& team) const;
+
 };

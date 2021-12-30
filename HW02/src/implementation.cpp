@@ -498,8 +498,6 @@ std::vector<Team> Hierarchy::teams_at(const int& level) const
     return result;
   }
 
-
-
   for( int i = 0; i < size; i++)
   {
       if( this->find_level_employee(i) == level)
@@ -562,6 +560,25 @@ std::vector<std::vector<Team>> Hierarchy::get_teams() const
     return max_id;
  }
 
+
+int Hierarchy::get_smallest_emp(const Team& team) const
+{
+  const int size = team.size();
+  
+  string smallest = get_name_by_idx(team.team_mates[0]);
+  int min = team.team_mates[0];
+  for( int i = 1; i< size;i++)
+  {
+    string current = get_name_by_idx(team.team_mates[i]);
+    std::cout << current << std::endl;
+    if( smallest >  current)
+    {
+      smallest = current;
+      min = team.team_mates[i];
+    }
+  }
+  return min;
+}
 
 void Hierarchy::incorporate()
 {
