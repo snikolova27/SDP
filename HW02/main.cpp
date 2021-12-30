@@ -26,10 +26,14 @@ int main()
 
     Hierarchy h(large);
     std::cout << h.longest_chain() << std::endl;
-    std::vector<Team> teams = h.teams_at(3);
+    std::vector<std::vector<Team>> teams = h.get_teams();
     for(int i = 0; i< teams.size();i++)
     {
-        teams[i].print();
+        for(int j = 0; j < teams[i].size();j++)
+        {
+         teams[i][j].print();
+        }
+   
     }
     // std::cout << h.find_level_employee(12) << std::endl;
     // std::cout << h.get_name_by_idx(12) << std::endl;

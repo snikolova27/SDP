@@ -515,10 +515,11 @@ std::vector<Team> Hierarchy::teams_at(const int& level) const
 std::vector<std::vector<Team>> Hierarchy::get_teams() const
 {
   std::vector<std::vector<Team>> result;
-  const int deepest_level = this->longest_chain() - 1;
-  for( int i = deepest_level; i >= 0; i++)
+  const int deepest_level = this->longest_chain() -1;
+  for( int i = deepest_level; i >= 0; i--)
   {
-
+    std::vector<Team> current = this->teams_at(i);
+    result.emplace_back(current);
   }
 
   return result;
