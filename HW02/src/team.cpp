@@ -28,3 +28,17 @@ void Team::print()
         std::cout << this->team_mates[i] << std::endl;
     }
 }
+
+int Team:: size() const
+{
+    return this->team_mates.size();
+}
+
+int Team::get_mate_at(const int index) const
+{
+    if( index > this->size() || index < 0)  //invalid index
+    {
+        return -1;
+    }
+    return this->team_mates[index];
+}

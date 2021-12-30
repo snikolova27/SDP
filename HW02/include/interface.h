@@ -63,7 +63,7 @@ private:
     int find_employee_with_highest_salary(const std::vector <int>& employees) const;
 
     /// @brief Return max salary of given employees
-    unsigned long max_salary(const std::vector <int>& employees) const;
+    unsigned long max_salary(const Team& team) const;
 
     /// @brief Return a vector with the indices of employees with highest salaries
     std::vector <int> get_vector_employees_id_highest_salary (const std::vector <int>& employees) const;
@@ -84,15 +84,17 @@ private:
   
 
     ///@brief Get the ids of managers who are on uneven levels
-    std::vector<int> uneven_levels_teams() const;
+    std::vector<std::vector<Team>> uneven_levels_teams() const;
 
     /// @brief Finds the level of a given employee by their index
     int find_level_employee(const int idx) const;
 
-    ///@brief Return name of employee by given index, if index is not valid - throws an exception
-    string get_name_by_idx(const int idx) const;
+  
 
 public:
+
+  ///@brief Return name of employee by given index, if index is not valid - throws an exception
+    string get_name_by_idx(const int idx) const;
     /// @brief Returns the teams on a given level
     std::vector<Team> teams_at(const int& level) const;
 
@@ -102,5 +104,7 @@ public:
     /// @brief Return the employees with given manager
     std::vector<int> get_emp_with_manager(const int& idx) const;
 
+    /// @brief Return the index of the employee with highest salary in a team, -1 if no such employee exist
+    int get_emp_with_greatest_salary(const Team& team) const;
 
 };
