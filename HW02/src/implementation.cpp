@@ -448,6 +448,21 @@ void Hierarchy::reasign_manager(const int idx_emp, const int idx_new_manager)
   
 }
 
+int Hierarchy::find_level_employee(const int idx) const
+{
+  if(idx == 0)    //the boss
+  {
+    return  0;
+  }
+  if(idx!= -1)
+  {
+      const string name = get_name_by_idx(idx);
+      return 1 + this->find_level_employee(find_manager(name));
+  }
+  return -1;
+ 
+}
+
 
 void Hierarchy::incorporate()
 {

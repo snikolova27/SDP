@@ -17,6 +17,8 @@ int main()
     "Slav1     - Mecho \n"
     "Mecho     - Q12Adl\n";
     Hierarchy h(lozenec);
-    std::cout << h.print();
+    // std::cout << h.find_level_employee(12) << std::endl;
+    // std::cout << h.get_name_by_idx(12) << std::endl;
+   // std::cout << h.print();
     return 0;
 }

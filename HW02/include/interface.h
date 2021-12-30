@@ -80,11 +80,16 @@ private:
     /// @brief Change the manager of an employee
     void reasign_manager(const int idx_emp, const int idx_new_manager);
 
-    ///@brief Return name of employee by given index, if index is not valid - throws an exception
-    string get_name_by_idx(const int idx) const;
+  
 
     ///@brief Get the ids of managers who are on uneven levels
     std::vector<int> uneven_levels_teams() const;
+
+    /// @brief Finds the level of a given employee by their index
+    int find_level_employee(const int idx) const;
+
+    ///@brief Return name of employee by given index, if index is not valid - throws an exception
+    string get_name_by_idx(const int idx) const;
 
 
 };
