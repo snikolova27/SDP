@@ -42,3 +42,8 @@ int Team::get_mate_at(const int index) const
     }
     return this->team_mates[index];
 }
+
+int Team::get_manager() const
+{
+    return this->manager;
+}

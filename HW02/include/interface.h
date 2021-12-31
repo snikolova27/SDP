@@ -63,7 +63,7 @@ private:
     int find_employee_with_highest_salary(const std::vector <int>& employees) const;
 
     /// @brief Return max salary of given employees
-    unsigned long max_salary(const Team& team) const;
+    unsigned long max_salary(const std::vector<int>& employees) const;
 
     /// @brief Return a vector with the indices of employees with highest salaries
     std::vector <int> get_vector_employees_id_highest_salary (const std::vector <int>& employees) const;
@@ -82,7 +82,8 @@ private:
     void reasign_manager(const int idx_emp, const int idx_new_manager);
 
   
-
+    int smallest_employee(const std::vector <int>& employees) const;
+    
     ///@brief Get the ids of managers who are on uneven levels
     std::vector<std::vector<Team>> uneven_levels_teams() const;
 

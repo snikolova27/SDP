@@ -285,14 +285,14 @@ int Hierarchy::longest_chain() const
     return dfsl(0);
  }
 
-unsigned long Hierarchy::max_salary(const Team& team) const
+unsigned long Hierarchy::max_salary(const std::vector<int>& employees) const
 {
   unsigned long max = 0;
   unsigned long current_max = 0;
-  const int size = team. size();
+  const int size = employees. size();
   for(int i = 0; i < size; i++)
   {
-    current_max = this->getSalary(this->employees[team.get_mate_at(i)]);
+    current_max = this->getSalary(this->employees[employees[i]]);
     if (current_max  > max  && current_max != (unsigned long) -1)
     {
       max = current_max;
@@ -301,72 +301,69 @@ unsigned long Hierarchy::max_salary(const Team& team) const
   return max;
 }
 
-// int Hierarchy::find_employee_with_highest_salary(const std::vector <int>& employees) const
-// {
-//   unsigned long max = max_salary(employees);
-//   unsigned long current_max = 0;
-//   int max_id = -1;
-//   int cnt_with_max_salary = 0;
+int Hierarchy::find_employee_with_highest_salary(const std::vector <int>& employees) const
+{
+  unsigned long max = max_salary(employees);
+  unsigned long current_max = 0;
+  int max_id = -1;
+  int cnt_with_max_salary = 0;
 
-//   const int size = employees. size();
-//   for(int i = 0; i < size; i++)
-//   {
-//     current_max = this->getSalary(this->employees [employees[i]]);
-//     if (current_max  > max  && current_max != (unsigned long) -1)
-//     {
-//       max_id = i;
-//     }
-//     else if (current_max == max && current_max != (unsigned long) -1)
-//     {
-//       cnt_with_max_salary++;
-//     }
-//   }
-//   if (cnt_with_max_salary > 1)  //more than one person with the highest salary
-//   {
-//     return -1;
-//   }
-//   return max_id;
-// }
+  const int size = employees. size();
+  for(int i = 0; i < size; i++)
+  {
+    current_max = this->getSalary(this->employees [employees[i]]);
+    if (current_max == max && current_max != (unsigned long) -1)
+    {
+      cnt_with_max_salary++;
+      max_id = employees[i];
+    }
+  }
+  if (cnt_with_max_salary > 1)  //more than one person with the highest salary
+  {
+    return -1;
+  }
+  return max_id;
+}
 
-// std::vector <int> Hierarchy::get_vector_employees_id_highest_salary (const std::vector <int>& employees) const
-// {
-//     unsigned long current = 0;
-//     const unsigned long max= max_salary(employees);
-//     const int size = employees.size();
-//     std::vector <int> res;
+std::vector <int> Hierarchy::get_vector_employees_id_highest_salary (const std::vector <int>& employees) const
+{
+    unsigned long current = 0;
+    const unsigned long max= max_salary(employees);
+    const int size = employees.size();
+    std::vector <int> res;
 
-//     for (int i = 0; i < size; i++)
-//     {
-//       current = this->getSalary(this->employees [employees[i]]);
-//       if ( current == max && current != (unsigned long) -1 )
-//       {
-//         res.emplace_back(i); //put the index of the employee in the result vector
-//       }
-//     }
+    for (int i = 0; i < size; i++)
+    {
+      current = this->getSalary(this->employees [employees[i]]);
+      if ( current == max && current != (unsigned long) -1 )
+      {
+        res.emplace_back(employees[i]); //put the index of the employee in the result vector
+      }
+    }
 
-//     return res;
-// }
+    return res;
+}
 
-// int Hierarchy::smallest_employee(const std::vector <int>& employees) const
-// {
-//   const int size = employees.size();
-//   if ( size == 0)
-//   {
-//     return -1; //empty vector
-//   }
+int Hierarchy::smallest_employee(const std::vector <int>& employees) const
+{
+  const int size = employees.size();
+  if ( size == 0)
+  {
+    return -1; //empty vector
+  }
 
-//   string current_smallest = this->employees[employees[0]];
-//   int smallest_id = -1;
-//   for (int i = 1; i < size ; i++)
-//   {
-//     if (this->employees[employees[i]] < current_smallest)
-//     {
-//       current_smallest = this->employees[employees[i]];
-//       smallest_id = employees[i];
-//     }
-//   }
-//   return smallest_id;
-// }
+  string current_smallest = this->employees[employees[0]];
+  int smallest_id = 0;
+  for (int i = 1; i < size ; i++)
+  {
+    if (this->employees[employees[i]] < current_smallest)
+    {
+      current_smallest = this->employees[employees[i]];
+      smallest_id = employees[i];
+    }
+  }
+  return smallest_id;
+}
 
 int Hierarchy::smallest_employee_from(const int from, const std::vector <int>& employees) const
 {
@@ -377,7 +374,7 @@ int Hierarchy::smallest_employee_from(const int from, const std::vector <int>& e
   }
 
   string current_smallest = this->employees[employees[from]];
-  int smallest_id = -1;
+  int smallest_id = employees[from];
   for (int i = from + 1; i < size ; i++)
   {
     if (this->employees[employees[i]] < current_smallest)
@@ -415,7 +412,7 @@ void Hierarchy::incorporate_helper(const int index, const int size, const std::v
 {
     for (int j = 0; j < index;j++)
           {
-            remove_connection(v[j]); //remove all manager connections of the other employees in this subs row
+            remove_connection(v[j]);  //remove all manager connections of the other employees in this subs row
             this->subs[index].push_back(v[j]); //make the smallest_emp_id the manager of all other employees in this subs row
           }
           for( int j = index + 1; j < size; j++)
@@ -428,20 +425,27 @@ void Hierarchy::incorporate_helper(const int index, const int size, const std::v
 void Hierarchy::reasign_manager(const int idx_emp, const int idx_new_manager)
 {
   const int current_manager = this->find_manager(this->get_name_by_idx(idx_emp)); //get the current manager
-  if( current_manager == -1 ||  current_manager == 0)
+  if( current_manager == -1 )
   {
     throw std::invalid_argument ("There is not a valid current manager");
   }
 
-  // remove employee from current manager
-
   // find position in the vector of employees of the current manager
-  const auto pos = std::find(this->subs[current_manager].begin(), this->subs[current_manager].end(), idx_emp);
-  if ( pos == this->subs[current_manager].end())
+  int emp_at_idx = -1;
+  for(int i = 0; i < this->subs[current_manager].size(); i++)
   {
+  if( this->subs[current_manager][i] == idx_emp)
+    {
+      emp_at_idx = i;
+      break;
+    }
+  }
+  if ( emp_at_idx == -1)
+  { 
     throw std::invalid_argument("Employee not found");
   }
-  this->subs[current_manager].erase(pos);
+ // remove employee from current manager
+  this->subs[current_manager].erase(this->subs[current_manager].begin() + emp_at_idx);
 
   // add employee to new manager
   this->subs[idx_new_manager].emplace_back(idx_emp);
@@ -490,11 +494,11 @@ std::vector<Team> Hierarchy::teams_at(const int& level) const
   }
   if ( level == 0)
   {
-    std::vector<int> t;
+     std::vector<int> t;
     Team current =Team(t);
     current.set_manager(0);
     managers[0] = false;
-    result.emplace_back(current);
+     result.emplace_back(current);
     return result;
   }
 
@@ -523,7 +527,7 @@ std::vector<Team> Hierarchy::teams_at(const int& level) const
 std::vector<std::vector<Team>> Hierarchy::get_teams() const
 {
   std::vector<std::vector<Team>> result;
-  const int deepest_level = this->longest_chain() -1;
+  const int deepest_level = this->longest_chain();
   for( int i = 0; i < deepest_level; i++)
   {
     std::vector<Team> current = this->teams_at(i);
@@ -533,32 +537,32 @@ std::vector<std::vector<Team>> Hierarchy::get_teams() const
   return result;
 }
 
- int Hierarchy::get_emp_with_greatest_salary(const Team& team) const
- {
-   unsigned long max = max_salary(team);
-   const int size = team.size();
-   unsigned long current;
-   int cnt = 0;
-   int max_id = -1;
-   for( int i = 0; i < size; i++)
-   {
-     current = this->getSalary(this->employees[team.get_mate_at(i)]);
-      if( current == max && cnt == 0)
-      {
-        cnt++;
-        max_id = team.get_mate_at(i);
-      }
-      else if (current == max)
-      {
-        cnt++;
-      }
-   }
-    if ( cnt != 1)
-    {
-      return -1; // more than one employee with greatest salary
-    }
-    return max_id;
- }
+//  int Hierarchy::get_emp_with_greatest_salary(const Team& team) const
+//  {
+//    unsigned long max = max_salary(team);
+//    const int size = team.size();
+//    unsigned long current;
+//    int cnt = 0;
+//    int max_id = -1;
+//    for( int i = 0; i < size; i++)
+//    {
+//      current = this->getSalary(this->employees[team.get_mate_at(i)]);
+//       if( current == max && cnt == 0)
+//       {
+//         cnt++;
+//         max_id = team.get_mate_at(i);
+//       }
+//       else if (current == max)
+//       {
+//         cnt++;
+//       }
+//    }
+//     if ( cnt != 1)
+//     {
+//       return -1; // more than one employee with greatest salary
+//     }
+//     return max_id;
+//  }
 
 
 int Hierarchy::get_smallest_emp(const Team& team) const
@@ -582,57 +586,87 @@ int Hierarchy::get_smallest_emp(const Team& team) const
 
 void Hierarchy::incorporate()
 {
-  // const int starting_teams = this->subs.size();
-  // for (int i = starting_teams -1 ; i >= 0; i--)  //starting at the bottom of the tree
-  // {
-  //   const auto & s = this->subs[i];
-  //   const int current_subs = s.size();
-  //   if( current_subs >= 2 )
-  //   {
-  //     if(find_employee_with_highest_salary(s) == -1)  //if more than one person with  the highest salary
-  //     {
-  //       std::vector <int> max_salaries_ids = get_vector_employees_id_highest_salary(s);
-  //       if(!max_salaries_ids.empty())
-  //       {
-  //         const int smallest_emp_id = smallest_employee_from(0,max_salaries_ids); //find lexicographically smallest employee with the highest salary
-  //         if( smallest_emp_id != -1)
-  //         {
-  //           this->incorporate_helper(smallest_emp_id , current_subs, s);
-  //         }
-  //         // for (int j = 0; j < smallest_emp_id;j++)
-  //         // {
-  //         //   remove_connection(s[j]); //remove all manager connections of the other employees in this subs row
-  //         //   this->subs[smallest_emp_id].push_back(s[j]); //make the smallest_emp_id the manager of all other employees in this subs row
-  //         // }
-  //         // for( int j = smallest_emp_id + 1; j < current_subs; j++)
-  //         // {
-  //         //   remove_connection(s[j]);
-  //         //   this->subs[smallest_emp_id].push_back(s[j]);
-  //         // }
-  //       }
-  //     }
-
-  //     const int max_salaries_id = find_employee_with_highest_salary(s);  //only one employee with the highest salary
-  //     if (max_salaries_id != -1)
-  //     {
-  //         this->incorporate_helper(max_salaries_id, current_subs, s);
-  //     }
+ const std::vector<std::vector<Team>> teams = this->get_teams();
+ std::vector <int> managers_to_incorporate;
     
-  //     // for (int j = 0; j < max_salaries_id;j++)
-  //     //     {
-  //     //       remove_connection(s[j]); //remove all manager connections of the other employees in this subs row
-  //     //       this->subs[max_salaries_id].push_back(s[j]); //make the smallest_emp_id the manager of all other employees in this subs row
-  //     //     }
-  //     //     for( int j = max_salaries_id + 1; j < current_subs; j++)
-  //     //     {
-  //     //       remove_connection(s[j]);
-  //     //       this->subs[max_salaries_id].push_back(s[j]);
-  //     //     }
-  //   }
-  // } 
+ const int size = teams.size();
+    for(int i = size - 1; i >= 0; i--)
+    {
+      const int current = teams[i].size();
+      for(int j=0; j< current;j++)
+      { 
+        if(teams[i][j].team_mates.size() >= 2 )
+        {
+          const int current_man = teams[i][j].get_manager();
+          managers_to_incorporate.emplace_back(current_man);
+        }
+      }
+    }
+
+const int size_imcorp = managers_to_incorporate.size();
+    for( int i = 0; i < size_imcorp; i++)
+    {
+      auto & current = this->subs[managers_to_incorporate[i]];
+      const int size_current = current.size();
+      const int max_salaries_id = find_employee_with_highest_salary(current); 
+
+      if(max_salaries_id == -1) //more than one person with the highest salary
+      {
+        std::vector <int> max_salaries_ids (get_vector_employees_id_highest_salary(current));
+        if(!max_salaries_ids.empty())
+        {
+          const int smallest_emp_id = smallest_employee_from(0,max_salaries_ids); //find lexicographically smallest employee with the highest salary
+          if( smallest_emp_id != -1)
+          {
+            const auto smallest_in_row = std::find(current.begin(), current.end(), smallest_emp_id);
+            if( smallest_in_row == current.end())
+            {
+              throw std::invalid_argument("Invalid smallest employee");
+            }
+            const int idx_smallest_in_row = smallest_in_row - current.begin();
+            std::vector <int> to_reasign_managers;
+            for(int k = 0; k < size_current;k++)
+            {
+              if ( k== idx_smallest_in_row)
+              {
+                continue;
+              }
+              to_reasign_managers.emplace_back(current[k]);
+            }
+            for( int j = 0; j < to_reasign_managers.size(); j++)
+            {
+              this->reasign_manager(to_reasign_managers[j], smallest_emp_id);
+            }
+          }
+         }
+      }
+       //only one employee with the highest salary
+      else 
+      {
+        const auto max_salary_row = std::find(current.begin(), current.end(), max_salaries_id);
+        if( max_salary_row == current.end())
+        {
+          throw std::invalid_argument("Invalid employee with greatest salary");
+        }
+        const int idx_max_in_row = max_salary_row - current.begin();
+        std::vector<int> to_reasign_managers;
+        for(int k = 0; k <size_current; k++)
+        {
+          if(k == idx_max_in_row)
+          {
+            continue;
+          }
+         to_reasign_managers.emplace_back(current[k]);
+        }
+        for( int j = 0; j < to_reasign_managers.size(); j++)
+            {
+              this->reasign_manager(to_reasign_managers[j], max_salaries_id);
+            }
+
+      }
+    }
 }
-
-
+ 
 // std::vector<int> Hierarchy::uneven_levels_teams() const
 // {
 //   const int size = this->employees.size();

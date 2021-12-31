@@ -17,4 +17,5 @@
      void print();
      int size() const;
      int get_mate_at(const int index) const;
+     int get_manager() const;
  };
