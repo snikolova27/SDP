@@ -7,7 +7,6 @@
 using std::string;
 using std::vector;
 
-const string TheBoss = "Uspeshnia";
 const string empty = "";
 class Input
 {

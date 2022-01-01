@@ -1,5 +1,5 @@
-#include "input.h"
 #include "interface.h"
+//#include "../include/interface.h"
 
 #include <algorithm>
 #include <sstream>
@@ -9,6 +9,12 @@
 #include <numeric>
 #include <queue>
 #include <vector>
+
+
+bool Hierarchy:: operator == (const Hierarchy& other) const
+{
+  return this->employees == other.employees && this->subs == other.subs;
+}
 
 Hierarchy::Hierarchy(const string& data)
 {
@@ -229,6 +235,7 @@ int Hierarchy::num_subordinates(const string& name) const
 
 int Hierarchy::cnt_all_subs(const int id) const
 {
+  std::cout << "id: "<<  id << std::endl;
   const auto & s = this->subs[id];
   int sum = s.size();
   for (int sub : s) 
@@ -259,26 +266,28 @@ int Hierarchy::num_overloaded(int level) const
 {
   int cnt = 0;
   const int size = this->subs.size();
-
-  for(int i=0; i < size; i++)
+  for( int i = 0; i < size; i++)
   {
+    std::cout << "i " << i << std::endl;
     if (cnt_all_subs(i) > level)
     {
+      // std::cout << 
       cnt++;
+    
     }
   }
   return cnt;
 }
 
 int Hierarchy::dfsl(const int id) const
-  {
+{
     int m = 0;
     for (int sub : this->subs[id])
     {
       m = std::max(m, dfsl(sub));
     } 
     return m + 1;
-  }
+ }
 
 int Hierarchy::longest_chain() const
  {
@@ -693,7 +702,103 @@ void  Hierarchy::modernize()
 
 Hierarchy Hierarchy::join(const Hierarchy& right) const
 {
-  return *this;
+  if( *this == right)
+  {
+    return *this;
+  }
+
+  Hierarchy result;
+  
+  const int idx_boss = this->find_id(TheBoss);
+  const int idx_boss_r = this->find_id(TheBoss);
+
+  if ( idx_boss == -1 || idx_boss_r == -1)
+  {
+    throw std::invalid_argument("The boss was not found");
+  }
+  if(!this->check_the_boss(right))
+  {
+    throw std::invalid_argument("The boss is not same in the hierarchies");
+  }
+
+  const int size_h1 = this->subs.size();
+  const int size_h2 = right.subs.size();
+
+  for( auto& s:this->subs)    //starting by looking the employees at one of the hierarchies
+  {
+    for( auto& emp:s)
+    {
+      const string current_emp = this->get_name_by_idx(emp);
+      if(!right.find(current_emp))    //if the employee is not in the second hierarchy
+      {
+        result.hire(current_emp, this->manager(current_emp));
+
+      
+        const int index_employee = emp;
+        const auto & current_subs  = this->subs[index_employee];
+        const int subs_current = current_subs.size();
+        for( int i = 0; i < subs_current; i++)  //hire all their direct subordinates from the first hierarchy
+        {
+          const string to_hire = this->get_name_by_idx(current_subs[i]);
+          result.hire(to_hire, current_emp);
+        }
+      }
+      else      // is in both hierarchies
+      {
+        const string manager_1 = this->manager(current_emp);
+        const string manager_2 = right.manager(current_emp);
+
+        if( manager_1 == manager_2) // if managers are the same, hire all the different subordinates of current employee from both hierarchies
+        {
+          result.hire_from_2_hierarchies_one_manager(current_emp, *this, right, manager_1);
+        }
+
+        // find the manager at a higher level
+        const int man_1_level = this->find_level_employee(this->find_id(manager_1));
+        const int man_2_level = right.find_level_employee(right.find_id(manager_2));
+
+        if( man_1_level == man_2_level && manager_1!= manager_2)   // have to choose the lexicographically smaller one
+        {
+          const string final_manager = manager_1 < manager_2 ? manager_1 : manager_2;
+          result.hire_from_2_hierarchies_one_manager(current_emp, *this, right, final_manager);
+
+        }
+        if ( man_1_level < man_2_level)   //manager in the first hierarchy is higher
+        {
+          result.hire_from_2_hierarchies_one_manager(current_emp, *this, right, manager_1);
+        }
+        if( man_2_level < man_1_level) 
+        {
+          result.hire_from_2_hierarchies_one_manager(current_emp, *this, right, manager_2);
+        }
+      }
+
+    }
+
+  }
+
+  for( auto& s2 : right.subs)
+  {
+    for(auto & emp2 : s2)
+    {
+      const string current_emp = right.get_name_by_idx(emp2);
+      if(!result.find(current_emp))   // not in the result hierarchy yet
+      {
+        result.hire(current_emp, right.manager(current_emp));
+
+        const int emp_idx = right.find_id(current_emp);
+        const auto& current_subs = right.subs[emp_idx];
+         const int subs_current = current_subs.size();
+        for( int i = 0; i < subs_current; i++)  //hire all their direct subordinates from the first hierarchy
+        {
+          const string to_hire = right.get_name_by_idx(current_subs[i]);
+          result.hire(to_hire, current_emp);
+        }
+      }
+    }
+  }
+
+  return result;
 }
 
 
@@ -713,4 +818,62 @@ const bool Hierarchy::is_indirect_manager(const int manager, const int to_whom) 
   }
 
   return false;
+}
+
+ const bool Hierarchy::indirect_manager(const string& manager, const string& to_whom) const
+ {
+   const int man_id = this->find_id(manager);
+   if( man_id == -1)
+   {
+     throw std::invalid_argument("Invalid manager index/name");
+   }
+   const int emp_id = this->find_id(to_whom);
+   if ( emp_id == -1)
+   {
+        throw std::invalid_argument("Invalid employee index/name");
+   }
+
+   return this->is_indirect_manager(man_id, emp_id);
+ }
+
+const bool Hierarchy::check_the_boss( const Hierarchy& h2) const
+{
+    return this->manager(TheBoss) == "" && h2.manager(TheBoss) == "";
+}
+
+const std::vector<int> Hierarchy::get_subs_of(const int id) const
+{
+  if( id < 0)
+  {
+    throw std::invalid_argument("Invalid index");
+  }
+  return this->subs[id];
+
+}
+
+void Hierarchy::hire_from_2_hierarchies_one_manager( const string& subs_of, const Hierarchy& first, const Hierarchy& second, const string& manager)
+{
+  this->hire(subs_of, manager);
+  const int idx_1 = first.find_id(subs_of);
+  const int idx_2 = second.find_id(subs_of);
+
+  // get the subordinates of the employees of both hierarchies
+  const std::vector<int> &subs_1 = first.get_subs_of(idx_1);
+  const std::vector<int> &subs_2 = second.get_subs_of(idx_2);
+  const int size_1 = subs_1.size();
+  const int size_2 = subs_2.size();
+
+  // from the first hierarchy
+  for (int i = 0; i < size_1; i++) 
+  {
+    this->hire(first.get_name_by_idx(subs_1[i]), subs_of);
+  }
+  // from the second hierarchy
+  for (int i = 0; i < size_2; i++) 
+  {
+    if (!this->find(second.get_name_by_idx(subs_2[i]))) // if it hasn't already been hired
+    {
+      this->hire(second.get_name_by_idx(subs_2[i]), subs_of);
+    }
+  }
 }

@@ -6,6 +6,7 @@
 using std::string;
 const int SALARY_PER_DIRECT_SUB = 500;
 const int SALARY_PER_NON_DIRECT_SUB = 50;
+const string TheBoss = "Uspeshnia";
 
 class Hierarchy
 {
@@ -13,8 +14,10 @@ public:
     Hierarchy(Hierarchy&& r) noexcept = default;
     Hierarchy(const Hierarchy& r) = default;
     Hierarchy(const string& data);
+    Hierarchy() {this->employees.emplace_back(TheBoss);}
     ~Hierarchy() noexcept = default;
     void operator=(const Hierarchy&) = delete;
+    bool operator == (const Hierarchy& other) const;
 
     string print() const;
 
@@ -30,9 +33,8 @@ public:
     bool fire(const string& who);
     bool hire(const string& who, const string& boss);
 
-    //TODO май е готова, ама със 
+ 
     void incorporate();
-    //TODO
     void modernize();
 
     //TODO
@@ -110,4 +112,14 @@ public:
     /// @brief Returns if the given manager is an indirect manager to the given employee
    const bool is_indirect_manager(const int manager, const int to_whom) const;
 
+    /// @brief Wrapper for is_indirect_manager that works with employee names
+   const bool indirect_manager(const string& manager, const string& to_whom) const;
+
+   const bool check_the_boss(const Hierarchy& h2) const;
+
+   const std::vector<int> get_subs_of(const int id) const;
+
+   void hire_from_2_hierarchies_one_manager(const string& subs_of, const Hierarchy& first, const Hierarchy& second, const string& manager);
+
 };
+
