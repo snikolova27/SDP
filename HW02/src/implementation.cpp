@@ -538,25 +538,6 @@ std::vector<std::vector<Team>> Hierarchy::get_teams() const
   return result;
 }
 
-int Hierarchy::get_smallest_emp(const Team& team) const
-{
-  const int size = team.size();
-  
-  string smallest = get_name_by_idx(team.team_mates[0]);
-  int min = team.team_mates[0];
-  for( int i = 1; i< size;i++)
-  {
-    string current = get_name_by_idx(team.team_mates[i]);
-    std::cout << current << std::endl;
-    if( smallest >  current)
-    {
-      smallest = current;
-      min = team.team_mates[i];
-    }
-  }
-  return min;
-}
-
 void Hierarchy::incorporate()
 {
  const std::vector<std::vector<Team>> teams = this->get_teams();
@@ -613,6 +594,7 @@ const int size_imcorp = managers_to_incorporate.size();
           }
          }
       }
+
        //only one employee with the highest salary
       else 
       {
@@ -641,7 +623,8 @@ const int size_imcorp = managers_to_incorporate.size();
 }
  
  std::vector<std::vector<Team>> Hierarchy::uneven_levels_teams() const
-{ std::vector<std::vector <Team>> res;
+{ 
+  std::vector<std::vector <Team>> res;
   std::vector<std::vector<Team>> teams = this->get_teams();
   const int size = teams.size();
   for( int i = 0; i < size; i++)
@@ -659,46 +642,6 @@ const bool Hierarchy::is_manager(const int who) const
   return !this->subs[who].empty();  // if subs at that index is empty => not a manager
 }
 
-bool Hierarchy::on_uneven_level(const int level, std::vector <int>& original_unevens) const
-{
-  for(auto i : original_unevens)
-  {
-    if(original_unevens[i] == level)
-    {
-      return true;
-    }
-  }
-  return false;
-}
-
- std::vector<int> Hierarchy::get_emps_on_level(const int level) const
- {
-   std::vector<int> res;
-   for( auto& e : this->employees)
-   {
-     const int current_id = this->find_id(e);
-     if( this->find_level_employee (current_id) == level)
-     {
-       res.emplace_back(current_id);
-     }
-   }
-   return res;
- }
-
-void Hierarchy::decrease_index(std::vector<std::vector <int>>& in)
-{
-  const int size = in.size();
-  for( int i = 0 ; i < size; i++)
-  {
-    const int inner_size = in[i].size();
-    for( int j = 0; j < inner_size; j++)
-    {
-      in[i][j] -=1;
-    }
-  }
-}
-    
-
 void  Hierarchy::modernize()
 {
   //save original uneven levels
@@ -713,35 +656,27 @@ void  Hierarchy::modernize()
     }
   }
 
-  // save the employees on the original uneven levels
-  std::vector<std::vector<int>> emps_on_uneven_levels;   // at index 0 is the smallest uneven level
-  for( auto g:uneven_levels)
-  {
-    std::vector <int> current_emps = this->get_emps_on_level(g);
-    emps_on_uneven_levels.emplace_back(current_emps);
-  }
-
   const int uneven = uneven_levels.size();
- const int subs_size = this->subs.size();
- ///std::vector<std::vector <bool> has_been_modernized(this->employees.size(), false);
- std::vector <string> to_be_modernized;
+  const int subs_size = this->subs.size();
 
-for(int g = 0; g < uneven ; g++ ) // start from the lowest uneven level
-{
-  for( int i =subs_size - 1; i >= 0 ; i--)
+  std::vector <string> to_be_modernized;
+
+  for(int g = 0; g < uneven ; g++ ) // start from the lowest uneven level
   {
-    const int current_row_size = this->subs[i].size();
-    for(int j = 0; j < current_row_size; j++)
+    for( int i =subs_size - 1; i >= 0 ; i--)
     {
-      const int current_emp = this->subs[i][j];
-      const int level_emp = this->find_level_employee(current_emp);
-      if(level_emp == uneven_levels[g] && this->is_manager(current_emp)) // if the employee is on an uneven level and is a manager
-      {       
-        to_be_modernized.emplace_back(this->get_name_by_idx( current_emp));
+      const int current_row_size = this->subs[i].size();
+      for(int j = 0; j < current_row_size; j++)
+      {
+        const int current_emp = this->subs[i][j];
+        const int level_emp = this->find_level_employee(current_emp);
+        if(level_emp == uneven_levels[g] && this->is_manager(current_emp)) // if the employee is on an uneven level and is a manager
+        {       
+          to_be_modernized.emplace_back(this->get_name_by_idx( current_emp));
+        }
       }
     }
   }
-}
   const int modernize_size = to_be_modernized.size();
   for(int i = 0; i < modernize_size; i++)
   {
@@ -759,4 +694,23 @@ for(int g = 0; g < uneven ; g++ ) // start from the lowest uneven level
 Hierarchy Hierarchy::join(const Hierarchy& right) const
 {
   return *this;
+}
+
+
+
+
+const bool Hierarchy::is_indirect_manager(const int manager, const int to_whom) const
+{
+  const int size = this->subs[manager].size();
+
+  for( int i = 0; i < size; i++)
+  {
+    if( this-> subs[manager] [i] == to_whom)
+    {
+      return true;
+    }
+     return this->is_indirect_manager(this->subs[manager][i], to_whom);
+  }
+
+  return false;
 }
