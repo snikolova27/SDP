@@ -90,6 +90,12 @@ private:
     /// @brief Finds the level of a given employee by their index
     int find_level_employee(const int idx) const;
 
+    bool on_uneven_level(const int level, std::vector <int>& original_unevens) const;
+
+    std::vector<int> get_emps_on_level(const int level) const;
+
+    void decrease_index (std::vector <std::vector <int>>& in);
+
   
 
 public:
@@ -105,9 +111,8 @@ public:
     /// @brief Return the employees with given manager
     std::vector<int> get_emp_with_manager(const int& idx) const;
 
-    /// @brief Return the index of the employee with highest salary in a team, -1 if no such employee exist
-    int get_emp_with_greatest_salary(const Team& team) const;
-
     int get_smallest_emp(const Team& team) const;
+
+    const bool is_manager(const int who) const;
 
 };

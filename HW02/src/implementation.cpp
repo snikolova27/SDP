@@ -8,6 +8,7 @@
 #include <iostream>
 #include <numeric>
 #include <queue>
+#include <vector>
 
 Hierarchy::Hierarchy(const string& data)
 {
@@ -386,7 +387,7 @@ int Hierarchy::smallest_employee_from(const int from, const std::vector <int>& e
   return smallest_id;
 }
 
-void Hierarchy::remove_connection(const int id_to_remove)
+void Hierarchy:: remove_connection(const int id_to_remove)
 {
   const int size = this->subs.size();
   int index = -1;
@@ -537,34 +538,6 @@ std::vector<std::vector<Team>> Hierarchy::get_teams() const
   return result;
 }
 
-//  int Hierarchy::get_emp_with_greatest_salary(const Team& team) const
-//  {
-//    unsigned long max = max_salary(team);
-//    const int size = team.size();
-//    unsigned long current;
-//    int cnt = 0;
-//    int max_id = -1;
-//    for( int i = 0; i < size; i++)
-//    {
-//      current = this->getSalary(this->employees[team.get_mate_at(i)]);
-//       if( current == max && cnt == 0)
-//       {
-//         cnt++;
-//         max_id = team.get_mate_at(i);
-//       }
-//       else if (current == max)
-//       {
-//         cnt++;
-//       }
-//    }
-//     if ( cnt != 1)
-//     {
-//       return -1; // more than one employee with greatest salary
-//     }
-//     return max_id;
-//  }
-
-
 int Hierarchy::get_smallest_emp(const Team& team) const
 {
   const int size = team.size();
@@ -667,25 +640,120 @@ const int size_imcorp = managers_to_incorporate.size();
     }
 }
  
-// std::vector<int> Hierarchy::uneven_levels_teams() const
-// {
-//   const int size = this->employees.size();
-//   std::vector <int> uneven;
-//   for (int i = 0; i < size; i++)
-//   {
-//     const auto & s = this->subs[i];
-//     if( i % 2 != 0 && s.size() > 0)
-//     {
-//       uneven.emplace_back(i);
-//     }
-//   }
-//   return uneven;
-  
-// }
+ std::vector<std::vector<Team>> Hierarchy::uneven_levels_teams() const
+{ std::vector<std::vector <Team>> res;
+  std::vector<std::vector<Team>> teams = this->get_teams();
+  const int size = teams.size();
+  for( int i = 0; i < size; i++)
+  {
+    if( i% 2 != 0)  //emplace all the teams on uneven levels
+    {
+      res.emplace_back(teams[i]); 
+    }
+  }
+  return res;
+}
+
+const bool Hierarchy::is_manager(const int who) const
+{
+  return !this->subs[who].empty();  // if subs at that index is empty => not a manager
+}
+
+bool Hierarchy::on_uneven_level(const int level, std::vector <int>& original_unevens) const
+{
+  for(auto i : original_unevens)
+  {
+    if(original_unevens[i] == level)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+ std::vector<int> Hierarchy::get_emps_on_level(const int level) const
+ {
+   std::vector<int> res;
+   for( auto& e : this->employees)
+   {
+     const int current_id = this->find_id(e);
+     if( this->find_level_employee (current_id) == level)
+     {
+       res.emplace_back(current_id);
+     }
+   }
+   return res;
+ }
+
+void Hierarchy::decrease_index(std::vector<std::vector <int>>& in)
+{
+  const int size = in.size();
+  for( int i = 0 ; i < size; i++)
+  {
+    const int inner_size = in[i].size();
+    for( int j = 0; j < inner_size; j++)
+    {
+      in[i][j] -=1;
+    }
+  }
+}
+    
 
 void  Hierarchy::modernize()
 {
+  //save original uneven levels
+  std::vector<int> uneven_levels;
+  const std::vector<std::vector <Team>> teams = this->get_teams();
+  const int size = teams.size();
+  for( int i = size - 1; i >= 0; i--)
+  {
+    if( i % 2 != 0)   //if we are on an uneven level
+    {
+      uneven_levels.emplace_back(i);
+    }
+  }
 
+  // save the employees on the original uneven levels
+  std::vector<std::vector<int>> emps_on_uneven_levels;   // at index 0 is the smallest uneven level
+  for( auto g:uneven_levels)
+  {
+    std::vector <int> current_emps = this->get_emps_on_level(g);
+    emps_on_uneven_levels.emplace_back(current_emps);
+  }
+
+  const int uneven = uneven_levels.size();
+ const int subs_size = this->subs.size();
+ ///std::vector<std::vector <bool> has_been_modernized(this->employees.size(), false);
+ std::vector <string> to_be_modernized;
+
+for(int g = 0; g < uneven ; g++ ) // start from the lowest uneven level
+{
+  for( int i =subs_size - 1; i >= 0 ; i--)
+  {
+    const int current_row_size = this->subs[i].size();
+    for(int j = 0; j < current_row_size; j++)
+    {
+      const int current_emp = this->subs[i][j];
+      const int level_emp = this->find_level_employee(current_emp);
+      if(level_emp == uneven_levels[g] && this->is_manager(current_emp)) // if the employee is on an uneven level and is a manager
+      {       
+        to_be_modernized.emplace_back(this->get_name_by_idx( current_emp));
+      }
+    }
+  }
+}
+  const int modernize_size = to_be_modernized.size();
+  for(int i = 0; i < modernize_size; i++)
+  {
+    const int idx = this->find_id(to_be_modernized[i]);
+    const int new_manager = this->find_id( manager(to_be_modernized[i]));
+    const int cnt_subs = this->subs[idx].size();
+    for( int k = 0; k < cnt_subs; k++)
+        {
+          this->reasign_manager(this->subs[idx][k] ,new_manager);  // switch the manager
+        }
+    this->fire(this->get_name_by_idx(idx));
+  }
 }
 
 Hierarchy Hierarchy::join(const Hierarchy& right) const
