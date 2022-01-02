@@ -889,8 +889,7 @@ void Hierarchy::hire_from_2_hierarchies_one_manager( const string& subs_of, cons
 
  bool Hierarchy::check_for_possible_join(const Hierarchy& h) const
  {
-   //for every employee in this hierarchy, find them in the other one, check the subordinates of that employee in the first one
-   // and 
+   // get the names of all employees
    std::vector<std::string> merged_names = this->employees;
    for (const std::string & name : h.employees) merged_names.emplace_back(name);
    sort_and_unique(merged_names);
@@ -915,6 +914,7 @@ void Hierarchy::hire_from_2_hierarchies_one_manager( const string& subs_of, cons
      }
    };
 
+   // map the names of the employees of both hierarchies
    fillMap(names1, map1);
    fillMap(names2, map2);
 
@@ -932,10 +932,11 @@ void Hierarchy::hire_from_2_hierarchies_one_manager( const string& subs_of, cons
      }
    };
 
+    // get subs of all employees from both hierarchies
    copySubs(names1, this->subs, map1);
    copySubs(names2, h.subs, map2);
 
-   // Actually do DFS
+   // do DFS searching for a loop
    std::vector<bool> visited(N, false);
    std::stack<int> s;
    bool has_loop = false;
