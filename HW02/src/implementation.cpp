@@ -235,7 +235,6 @@ int Hierarchy::num_subordinates(const string& name) const
 
 int Hierarchy::cnt_all_subs(const int id) const
 {
-  std::cout << "id: "<<  id << std::endl;
   const auto & s = this->subs[id];
   int sum = s.size();
   for (int sub : s) 
@@ -268,12 +267,9 @@ int Hierarchy::num_overloaded(int level) const
   const int size = this->subs.size();
   for( int i = 0; i < size; i++)
   {
-    std::cout << "i " << i << std::endl;
-    if (cnt_all_subs(i) > level)
+     if (cnt_all_subs(i) > level)
     {
-      // std::cout << 
       cnt++;
-    
     }
   }
   return cnt;

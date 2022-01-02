@@ -14,7 +14,7 @@ public:
     Hierarchy(Hierarchy&& r) noexcept = default;
     Hierarchy(const Hierarchy& r) = default;
     Hierarchy(const string& data);
-    Hierarchy() {this->employees.emplace_back(TheBoss);}
+    Hierarchy() {this->employees.emplace_back(TheBoss); this->subs.emplace_back();}
     ~Hierarchy() noexcept = default;
     void operator=(const Hierarchy&) = delete;
     bool operator == (const Hierarchy& other) const;

@@ -3,7 +3,7 @@
 
 #include "interface.h"
 
-const string TheBoss = "Uspeshnia";
+//const string TheBoss = "Uspeshnia";
 
 const string lozenec =
     "Uspeshnia - Gosho \n"
@@ -35,6 +35,7 @@ void create(const string& str)
 {
     Hierarchy h(str);
 }
+
 
 TEST_CASE("Create and save hierarchy") {
     SECTION("Empty") {
@@ -236,6 +237,7 @@ TEST_CASE("Incorporate") {
     REQUIRE(loz.manager("Misho") == "Gosho");
 
 
+
     Hierarchy h(large);
     CHECK(h.longest_chain() == 4);
     CHECK(h.num_employees() == 25);
@@ -253,7 +255,9 @@ TEST_CASE("Incorporate") {
     REQUIRE(h.manager("2") == "3");
     REQUIRE(h.num_subordinates("21") == 7);
     REQUIRE(h.num_subordinates("3") == 6);
+    
 }
+
 
 
 TEST_CASE("Modernize") {
@@ -293,6 +297,8 @@ TEST_CASE("Modernize") {
 }
 
 
+
+
 TEST_CASE("Join") {
     Hierarchy l_new(loz_new);
     Hierarchy loz(lozenec);
@@ -308,9 +314,10 @@ TEST_CASE("Join") {
         "\nMishoPetrov-Slav\nSlavi-Slav1\nSlavi-Slav2\nDancho-Boris\nDancho-Kamen\nPesho-Alex\nSlav1-Mecho\nMecho-Q12Adl\n");
     REQUIRE(joined.num_employees() == 15);
     REQUIRE(joined.longest_chain() == 5);
-
+   
     Hierarchy joined2 = h.join(loz);
     REQUIRE(joined2.num_employees() == 13 + 24);
     REQUIRE(joined2.num_subordinates(TheBoss) == 4);
     REQUIRE(joined2.num_overloaded() == 2);
 }
+
