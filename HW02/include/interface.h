@@ -121,5 +121,7 @@ public:
 
    void hire_from_2_hierarchies_one_manager(const string& subs_of, const Hierarchy& first, const Hierarchy& second, const string& manager);
 
+   bool check_for_possible_join(const Hierarchy& h) const;
+
 };
 

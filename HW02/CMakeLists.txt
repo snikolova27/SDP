@@ -13,6 +13,9 @@ target_link_libraries   (Homework02 OfficeLib)
 add_executable(Tests tests.cpp)
 target_link_libraries(Tests OfficeLib)
 
+add_executable(MyTests src/myTests.cpp)
+target_link_libraries(MyTests OfficeLib)
+
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)

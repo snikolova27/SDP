@@ -30,6 +30,19 @@ const string loz_new =
     "2-21\n2-22\n2-23\n2-24\n2-25\n2-26\n2-27\n2-28\n"
     "3-31\n3-32\n3-33\n3-34\n3-35\n3-36\n3-37\n3-38\n3-39\n";
 
+
+    const string h1 =
+    "A - B \n"
+    "A - E \n"
+    "B - C \n"
+    "C - D \n";
+
+    const string h2 =
+    "A - D \n"
+    "A - C \n"
+    "D - E \n"
+    "E - B \n";
+
     Hierarchy h(large);
     Hierarchy loz(lozenec);
     Hierarchy l_new(loz_new);
@@ -39,11 +52,9 @@ const string loz_new =
     Hierarchy joined = l_new.join(loz);
     Hierarchy joined2 = h.join(loz);
 
-
-  //  std::cout << joined2.print() << std::endl;
-    std::cout << joined2.num_overloaded();
-    //std::cout << h.longest_chain() << std::endl;
-   // std::vector<std::vector<Team>> teams = h.get_teams();
+Hierarchy hr1(h1);
+Hierarchy hr2(h2);
+Hierarchy joined3 = hr1.join(hr2);
 
    // std::cout <<h.print();
 
