@@ -1,5 +1,5 @@
+#include "input.h"
 #include "interface.h"
-//#include "../include/interface.h"
 
 #include <algorithm>
 #include <sstream>
@@ -8,14 +8,7 @@
 #include <iostream>
 #include <numeric>
 #include <queue>
-#include <stack>
 #include <vector>
-
-
-bool Hierarchy:: operator == (const Hierarchy& other) const
-{
-  return this->employees == other.employees && this->subs == other.subs;
-}
 
 Hierarchy::Hierarchy(const string& data)
 {
@@ -266,9 +259,10 @@ int Hierarchy::num_overloaded(int level) const
 {
   int cnt = 0;
   const int size = this->subs.size();
-  for( int i = 0; i < size; i++)
+
+  for(int i=0; i < size; i++)
   {
-     if (cnt_all_subs(i) > level)
+    if (cnt_all_subs(i) > level)
     {
       cnt++;
     }
@@ -277,14 +271,14 @@ int Hierarchy::num_overloaded(int level) const
 }
 
 int Hierarchy::dfsl(const int id) const
-{
+  {
     int m = 0;
     for (int sub : this->subs[id])
     {
       m = std::max(m, dfsl(sub));
     } 
     return m + 1;
- }
+  }
 
 int Hierarchy::longest_chain() const
  {
@@ -699,15 +693,10 @@ void  Hierarchy::modernize()
 
 Hierarchy Hierarchy::join(const Hierarchy& right) const
 {
-  if( *this == right)
-  {
-    return *this;
-  }
+  // if( *this == right)
+  // {
 
-  else if(this->check_for_possible_join(right))
-  {
-    throw std::logic_error("Cannot join the hierarchies");
-  }
+  // }
 
   Hierarchy result;
   
@@ -735,13 +724,10 @@ Hierarchy Hierarchy::join(const Hierarchy& right) const
       {
         result.hire(current_emp, this->manager(current_emp));
 
-      
-        const int index_employee = emp;
-        const auto & current_subs  = this->subs[index_employee];
-        const int subs_current = current_subs.size();
+        const int subs_current = s.size();
         for( int i = 0; i < subs_current; i++)  //hire all their direct subordinates from the first hierarchy
         {
-          const string to_hire = this->get_name_by_idx(current_subs[i]);
+          const string to_hire = this->get_name_by_idx(s[i]);
           result.hire(to_hire, current_emp);
         }
       }
@@ -788,12 +774,10 @@ Hierarchy Hierarchy::join(const Hierarchy& right) const
       {
         result.hire(current_emp, right.manager(current_emp));
 
-        const int emp_idx = right.find_id(current_emp);
-        const auto& current_subs = right.subs[emp_idx];
-         const int subs_current = current_subs.size();
+        const int subs_current = s2.size();
         for( int i = 0; i < subs_current; i++)  //hire all their direct subordinates from the first hierarchy
         {
-          const string to_hire = right.get_name_by_idx(current_subs[i]);
+          const string to_hire = right.get_name_by_idx(s2[i]);
           result.hire(to_hire, current_emp);
         }
       }
@@ -879,93 +863,3 @@ void Hierarchy::hire_from_2_hierarchies_one_manager( const string& subs_of, cons
     }
   }
 }
-
- template<typename T>
- void sort_and_unique(std::vector<T> & v)
- {
-   std::sort(v.begin(), v.end());
-   v.erase(std::unique(v.begin(), v.end()), v.end());
- }
-
- bool Hierarchy::check_for_possible_join(const Hierarchy& h) const
- {
-   //for every employee in this hierarchy, find them in the other one, check the subordinates of that employee in the first one
-   // and 
-   std::vector<std::string> merged_names = this->employees;
-   for (const std::string & name : h.employees) merged_names.emplace_back(name);
-   sort_and_unique(merged_names);
-
-   const auto & names1 = this->employees;
-   const auto & names2 = h.employees;
-   using IdMap = std::vector<int>;
-   IdMap map1(names1.size());
-   IdMap map2(names2.size());
-
-   auto get_new_id = [&](const std::string & s) -> int
-   {
-     const auto it = std::lower_bound(merged_names.begin(), merged_names.end(), s);
-     return it - merged_names.begin();
-   };
-
-   auto fillMap = [&](const std::vector<std::string> & n, IdMap & m)
-   {
-     for (int i = 0; i < n.size(); i++)
-     {
-       m[i] = get_new_id(n[i]);
-     }
-   };
-
-   fillMap(names1, map1);
-   fillMap(names2, map2);
-
-   const int N = merged_names.size();
-   std::vector<std::vector<int>> nsubs(N);
-
-   auto copySubs = [&](const std::vector<std::string> & n, const std::vector<std::vector<int>> & s,
-                       const IdMap & m)
-   {
-     for (int i = 0; i < n.size(); i++)
-     {
-       const int v = get_new_id(n[i]);
-       auto & nvs = nsubs[v];
-       for (int os : s[i]) nvs.emplace_back(m[os]);
-     }
-   };
-
-   copySubs(names1, this->subs, map1);
-   copySubs(names2, h.subs, map2);
-
-   // Actually do DFS
-   std::vector<bool> visited(N, false);
-   std::stack<int> s;
-   bool has_loop = false;
-   for (int i = 0; i < N; i++)
-   {
-     if (visited[i]) continue;
-     visited[i] = true;
-     s.push(i);
-
-     while (!s.empty())
-     {
-       const int curr = s.top();
-       s.pop();
-
-       const auto & sc = nsubs[curr];
-       for (int next : sc)
-       {
-         if (visited[next])
-         {
-           has_loop = true;
-           break;
-         }
-
-         visited[next] = true;
-         s.push(next);
-       }
-     }
-
-     if (has_loop) break;
-   }
-
-   return !has_loop;
- }

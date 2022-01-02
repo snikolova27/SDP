@@ -1,8 +1,9 @@
+#include "commands.h"
 #include "interface.h"
 #include "team.h"
 #include "iostream"
 
-int main()
+int main(int argc, char **argv)
 {
 const string loz_new =
     " Uspeshnia   -  MishoPetrov \n"
@@ -47,14 +48,14 @@ const string loz_new =
     Hierarchy loz(lozenec);
     Hierarchy l_new(loz_new);
 
-   Hierarchy l2 = loz.join(loz);
+//    Hierarchy l2 = loz.join(loz);
 
-    Hierarchy joined = l_new.join(loz);
-    Hierarchy joined2 = h.join(loz);
+//     Hierarchy joined = l_new.join(loz);
+//     Hierarchy joined2 = h.join(loz);
 
-Hierarchy hr1(h1);
-Hierarchy hr2(h2);
-Hierarchy joined3 = hr1.join(hr2);
+// Hierarchy hr1(h1);
+// Hierarchy hr2(h2);
+// Hierarchy joined3 = hr1.join(hr2);
 
    // std::cout <<h.print();
 
@@ -76,15 +77,25 @@ Hierarchy joined3 = hr1.join(hr2);
 
 //std::cout << joined.print() << std::endl;
 
+  CommandProcessor cmd;
+  cmd.help(std::cout);
+  std::string line;
+    while (std::getline(std::cin, line))
+    {
+        try
+        {
+            if ( line == "exit" || line == "EXIT")
+            {
+               return cmd.exit();
+            }
+            cmd.process_command(line);
+            std::cout << " ========  Command OK  ========" << std::endl;
+        }
+        catch (const std::exception &e)
+        {
 
-
-   // teams[0][0].print(); 
-   // std::cout << h.get_emp_with_greatest_salary(teams[3][1]) << std::endl;
-    //std::cout << h.get_name_by_idx(h.get_emp_with_greatest_salary(teams[3][1])) << std::endl;
-   // std::cout << h.get_smallest_emp(teams[3][1]) << std::endl;
-   // std::cout <<h.get_name_by_idx(  h.get_smallest_emp(teams[3][1])) << std::endl;
-    // std::cout << h.find_level_employee(12) << std::endl;
-    // std::cout << h.get_name_by_idx(12) << std::endl;
-   // std::cout << h.print();
+            std::cerr << "Command FAILED: " << e.what() << std::endl;
+        }
+    }
     return 0;
 }

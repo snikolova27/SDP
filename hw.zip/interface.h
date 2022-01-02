@@ -14,10 +14,9 @@ public:
     Hierarchy(Hierarchy&& r) noexcept = default;
     Hierarchy(const Hierarchy& r) = default;
     Hierarchy(const string& data);
-    Hierarchy() {this->employees.emplace_back(TheBoss); this->subs.emplace_back();}
+    Hierarchy() {this->employees.emplace_back(TheBoss);}
     ~Hierarchy() noexcept = default;
     void operator=(const Hierarchy&) = delete;
-    bool operator == (const Hierarchy& other) const;
 
     string print() const;
 
@@ -92,6 +91,8 @@ private:
     /// @brief Finds the level of a given employee by their index
     int find_level_employee(const int idx) const;
 
+public:
+
      ///@brief Return name of employee by given index, if index is not valid - throws an exception
     string get_name_by_idx(const int idx) const;
 
@@ -113,22 +114,11 @@ private:
     /// @brief Wrapper for is_indirect_manager that works with employee names
    const bool indirect_manager(const string& manager, const string& to_whom) const;
 
-   /// @brief Validation check for boss
    const bool check_the_boss(const Hierarchy& h2) const;
 
-   /// @brief Returns a vector of the subs of given employee
-   /// @param id - employee id
    const std::vector<int> get_subs_of(const int id) const;
 
-   /// @brief Hire the emloyees who share a manager from two hierarchies
-   /// @param subs_of - the employee in both hierarchies
-   /// @param first - first hierarchy
-   /// @param second - second hierarchy
-   /// @param manager - under which manager
    void hire_from_2_hierarchies_one_manager(const string& subs_of, const Hierarchy& first, const Hierarchy& second, const string& manager);
-
-   /// @brief Returns if a join is possible
-   bool check_for_possible_join(const Hierarchy& h) const;
 
 };
 
