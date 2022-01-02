@@ -18,8 +18,9 @@ TEST_CASE("Impossible join")
     "E - B \n";
     Hierarchy hr1(h1);
     Hierarchy hr2(h2);
+    Hierarchy empty;
 
-    REQUIRE_THROWS(hr1.join(hr2));
+    REQUIRE(hr1.join(hr2) == empty);
 
     const string h3 = 
     " Uspeshnia - A \n"
@@ -33,14 +34,13 @@ TEST_CASE("Impossible join")
 
     Hierarchy hr3(h3);
     Hierarchy hr4(h4);
-    REQUIRE_THROWS(hr3.join(hr4));
+    REQUIRE(hr3.join(hr4) == empty);
 
 
     const string h5 = 
     " Uspeshnia - A \n"
     " A - X \n";
    
-
     const string h6 = 
     "Uspeshnia - X \n"
     "X - T \n"
@@ -48,8 +48,6 @@ TEST_CASE("Impossible join")
 
     Hierarchy hr5(h5);
     Hierarchy hr6(h6);
-
-    REQUIRE_THROWS(hr5.join(hr6));
-
+    REQUIRE(hr5.join(hr6) == empty);
 
 }

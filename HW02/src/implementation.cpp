@@ -699,6 +699,7 @@ void  Hierarchy::modernize()
 
 Hierarchy Hierarchy::join(const Hierarchy& right) const
 {
+  Hierarchy result;
   if( *this == right)
   {
     return *this;
@@ -706,11 +707,9 @@ Hierarchy Hierarchy::join(const Hierarchy& right) const
 
   else if(!this->check_for_possible_join(right))
   {
-    throw std::logic_error("Cannot join the hierarchies");
+    return result;
   }
-
-  Hierarchy result;
-  
+ 
   const int idx_boss = this->find_id(TheBoss);
   const int idx_boss_r = this->find_id(TheBoss);
 
