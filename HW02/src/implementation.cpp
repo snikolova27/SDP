@@ -704,7 +704,7 @@ Hierarchy Hierarchy::join(const Hierarchy& right) const
     return *this;
   }
 
-  else if(this->check_for_possible_join(right))
+  else if(!this->check_for_possible_join(right))
   {
     throw std::logic_error("Cannot join the hierarchies");
   }
