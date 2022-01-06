@@ -1,4 +1,5 @@
 #include "include/interface.h"
+#include <fstream>
 #include <iostream>
 #include <stdexcept>
 
@@ -15,5 +16,15 @@ int main(int argc, char **argv)
     {
         std::cout << argv [i] << std::endl;
     }
+
+    const std::string fileName1 = argv[1];
+    const std::string fileName2 = argv[2];
+
+    std::ifstream file1 (fileName1);
+    std::ifstream file2 (fileName2);
+
+    Comparator c;
+    c.compare(file1, file2);
+
     return 0;
 }

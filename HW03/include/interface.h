@@ -57,5 +57,7 @@ class Comparator {
 public:
 	ComparisonReport compare(std::istream& a, std::istream& b);
 
+private:
+	
 	// You can add additional members if you need to
 };

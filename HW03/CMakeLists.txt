@@ -4,7 +4,7 @@ project(Homework03 VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-add_library(Words src/implementation.cpp Homework03.cpp)
+add_library(Words src/implementation.cpp)
 target_include_directories(Words PUBLIC include/)
 
 add_executable(Homework03 main.cpp)
