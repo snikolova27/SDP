@@ -1,6 +1,8 @@
 #include <iostream>
 #include <set>
 #include <string>
+#include <vector>
+//#include "multiSet.h"
 
 ///
 /// Represents a multiset of words
@@ -10,7 +12,8 @@
 ///
 /// Implement all methods of this class
 /// 
-class WordsMultiset {
+class WordsMultiset 
+{	
 public:
 	/// Adds times occurences of word to the container
 	///
@@ -30,7 +33,23 @@ public:
 	/// Returns a multiset of all words in the container
 	std::multiset<std::string> words() const;
 	
-	// You can add additional members if you need to
+	
+//private:
+    std::vector<std::string> elements;
+    std::vector <int> occurences;
+
+	///@brief Returns the index of the key in an array, -1 if not found
+    /// @param v - vector to search in
+    /// @param leftIdx - lower boundary
+    /// @param rightIdx - upper boundary
+    /// @param key - element we are searching for
+    int binarySearch(const std::vector <std::string> v, int leftIdx, int rightIdx, const std::string& key) const;
+
+    /// @brief Uses binary search to find the insertion position of an element, returns index 
+    /// @param v - vector to search in
+    /// @param elem - elem we want to add
+    int findInsertionPos(const std::vector <std::string> v, const std::string& elem) const;
+
 };
 
 ///
@@ -61,3 +80,5 @@ private:
 	
 	// You can add additional members if you need to
 };
+
+

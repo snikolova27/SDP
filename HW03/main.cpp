@@ -1,4 +1,5 @@
 #include "include/interface.h"
+#include "multiSet.h"
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -22,9 +23,6 @@ int main(int argc, char **argv)
 
     std::ifstream file1 (fileName1);
     std::ifstream file2 (fileName2);
-
-    Comparator c;
-    c.compare(file1, file2);
 
     return 0;
 }
