@@ -705,11 +705,6 @@ Hierarchy Hierarchy::join(const Hierarchy& right) const
     return *this;
   }
 
-  else if(!this->check_for_possible_join(right))
-  {
-    return result;
-  }
- 
   const int idx_boss = this->find_id(TheBoss);
   const int idx_boss_r = this->find_id(TheBoss);
 
@@ -799,11 +794,17 @@ Hierarchy Hierarchy::join(const Hierarchy& right) const
     }
   }
 
+  if(!this->check_for_possible_join(right))
+  {
+    if(this->has_loop(result))
+    {
+    Hierarchy empty;
+    return empty;
+    }
+  
+  }
   return result;
 }
-
-
-
 
 const bool Hierarchy::is_indirect_manager(const int manager, const int to_whom) const
 {
@@ -968,4 +969,41 @@ void Hierarchy::hire_from_2_hierarchies_one_manager( const string& subs_of, cons
    }
 
    return !has_loop;
+ }
+
+
+ bool Hierarchy:: has_loop(const Hierarchy& h) const
+ {
+   const int size = h.employees.size();
+   std::vector <bool> visited(size, false);
+   std::stack<int> s;
+   bool has_loop = false;
+   for (int i = 0; i < size; i++)
+   {
+     if (visited[i]) continue;
+     visited[i] = true;
+     s.push(i);
+
+     while (!s.empty())
+     {
+       const int curr = s.top();
+       s.pop();
+
+       const auto & sc = h.subs[curr];
+       for (int next : sc)
+       {
+         if (visited[next])
+         {
+           has_loop = true;
+           break;
+         }
+
+         visited[next] = true;
+         s.push(next);
+       }
+     }
+
+     if (has_loop) break;
+   }
+   return has_loop;
  }

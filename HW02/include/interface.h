@@ -130,5 +130,6 @@ private:
    /// @brief Returns if a join is possible
    bool check_for_possible_join(const Hierarchy& h) const;
 
+   bool has_loop(const Hierarchy& h) const;
 };
 
