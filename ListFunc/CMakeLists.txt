@@ -1,0 +1,15 @@
+cmake_minimum_required(VERSION 3.0.0)
+project(ListFunc VERSION 0.1.0)
+
+include(CTest)
+enable_testing()
+
+add_library(Functional source/exceptions.cpp source/commandTokens.cpp)
+target_include_directories(Functional PUBLIC include/)
+
+add_executable(ListFunc main.cpp)
+target_link_libraries(ListFunc Functional)
+
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+include(CPack)
