@@ -38,10 +38,12 @@ class InvalidCharacter : public Exception
 
 class InvalidSyntax : public Exception
 {
+    public:
     InvalidSyntax(const std::string& description);
 };
 
 class RunTime : public Exception
 {
+    public:
     RunTime(const std::string& description);
 };
