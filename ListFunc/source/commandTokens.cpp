@@ -1,6 +1,7 @@
 #include "commandTokens.h"
 #include <ostream>
 
+// -------- Base token --------
 Token :: Token(const Type type) : type(type) {};
 
 void Token :: print(std::ostream& out) const
@@ -50,6 +51,8 @@ void Token :: print(std::ostream& out) const
         }
     }
 }
+
+// -------- Function token --------
 FunctionT::FunctionT(const std::string& name) : Token(Type::NAME_OF_FUNCTION), name(name){}
 
 void FunctionT::print(std::ostream &out) const
@@ -58,6 +61,7 @@ void FunctionT::print(std::ostream &out) const
     out << ": " << this->name << std::endl;
 }
 
+// -------- Number token --------
 NumberT :: NumberT(const double value) : Token(Type::NUMBER), value(value) {}
 
 void NumberT::print(std::ostream& out) const
@@ -66,6 +70,7 @@ void NumberT::print(std::ostream& out) const
     out << ": " << this->value << std::endl;
 }
 
+// -------- Argument token --------
 ArgumentT :: ArgumentT(const unsigned value) : Token(Type::ARGUMENT), value(value) {}
 
 void ArgumentT::print(std::ostream& out) const

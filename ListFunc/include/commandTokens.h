@@ -6,10 +6,8 @@
 // Base class for tokens
 class Token
 {
-    private:
-    Type type;
-
     public:
+    Type type;
     Token(const Type type);
 
     virtual void print(std::ostream& out) const;
@@ -18,10 +16,8 @@ class Token
 // Class for function tokens
 class FunctionT : public Token
 {
-    private:
-    std::string name;
-
     public:
+    std::string name;
     FunctionT(const std::string& name);
 
     void print(std::ostream& out) const override;
@@ -30,10 +26,8 @@ class FunctionT : public Token
 // Class for number tokens
 class NumberT : public Token
 {
-    private:
-    double value;
-
     public:
+    double value;
     NumberT(const double value);
 
     void print(std::ostream& out) const override;
@@ -42,10 +36,8 @@ class NumberT : public Token
 // Class for argument tokens
 class ArgumentT : public Token
 {
-    private:
-    unsigned value;
-
     public:
+    unsigned value;
     ArgumentT(const unsigned value);
     
     void print(std::ostream& out) const override;    
