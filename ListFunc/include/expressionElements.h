@@ -133,3 +133,24 @@ class MapOperation : public Element
 
     void print(std::ostream& out) const override;
 };
+
+// Class to store user defined functions and their arguments
+class UserFunc : public Element
+{
+    private:
+    const Element* definition;
+    std::vector<const Element*> args;
+
+    void copy(const UserFunc& other);
+    void deallocate();
+
+    public:
+    UserFunc(const Token* token, const Element* def, const std::vector<const Element*>& args);
+    UserFunc(const UserFunc& other);
+    UserFunc& operator=(const UserFunc& other);
+    ~UserFunc();
+
+    UserFunc* clone() const override;
+
+    void print(std::ostream& out) const override;
+};

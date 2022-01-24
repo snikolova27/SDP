@@ -322,4 +322,71 @@ void MapOperation::print(std::ostream& out) const
     out << ")";
 }
 
+// --------User defined functions --------
+UserFunc::UserFunc(const Token* token, const Element* def, const std::vector<const Element*>& args) :
+                                                Element(token), definition(def), args(args) {}
 
+UserFunc::UserFunc(const UserFunc& other) : Element(other.token)
+{
+    this->copy(other);
+}
+UserFunc& UserFunc::operator=(const UserFunc& other)
+{
+    if( this != &other)
+    {
+        this->deallocate();
+        Element::operator=(other);
+        this->copy(other);
+    }
+    return *this;
+}
+UserFunc::~UserFunc()
+{
+    this->deallocate();
+}
+
+void UserFunc::copy(const UserFunc& other)
+{
+   this->definition = other.definition->clone();
+   const int size = other.args.size();
+   for(int i = 0; i < size;i++)
+   {
+       this->args.push_back(other.args[i]->clone());
+   }
+}
+
+void UserFunc::deallocate()
+{
+    const int size = this->args.size();
+    for(int i = 0; i < size; i++)
+    {
+        delete this->args[i];
+        this->args[i]=nullptr;
+    }
+}
+
+void UserFunc::print(std::ostream& out) const
+{
+    out << "(";
+    Element::print(out);
+    out << ' ';
+    if(this->definition) this->definition->print(out);
+    else {out << "()";}
+
+    const int size = this->args.size();
+    if(size)
+    {
+        out << " ";
+        for( int i = 0; i < size; i++)
+        {
+            this->args[i]->print(out);
+            out << " ";
+        }
+    }
+    out << ")";
+}
+
+UserFunc* UserFunc::clone() const
+{
+    return new UserFunc(*this);
+}
