@@ -19,10 +19,11 @@ class Element
 
     virtual ~Element();
 
+    /// @brief Prints the tokens in a given stream
     virtual void print(std::ostream& out) const;
 
-    virtual Element* clone() const; // Copying the value, not the pointer
-
+    /// @brief Copies the value, not the pointer
+    virtual Element* clone() const;
 };
 
 
@@ -34,6 +35,7 @@ class ArgElement : public Element
     ArgElement(const ArgElement& other);
     ArgElement& operator= (const ArgElement& other);
 
+    /// @brief Copies the value, not the pointer
     ArgElement* clone() const override;    
 };
 
@@ -45,6 +47,7 @@ class FactorElement : public Element
     FactorElement(const ArgElement& other);
     FactorElement& operator= (const ArgElement& other);
 
+    /// @brief Copies the value, not the pointer
     FactorElement* clone() const override;    
 };
 
@@ -60,8 +63,10 @@ class UnaryOperation : public Element
     ~UnaryOperation();
     UnaryOperation& operator=(const UnaryOperation& other);
 
+    /// @brief Copies the value, not the pointer
     UnaryOperation* clone() const override;
 
+    /// @brief Prints the tokens in a stream
     void print(std::ostream& out) const override;
 };
 
@@ -79,8 +84,10 @@ class BinaryOperation : public Element
     ~BinaryOperation();
     BinaryOperation& operator=(const BinaryOperation& other);
 
+   /// @brief Copies the value, not the pointer
     BinaryOperation* clone() const override;
 
+    /// @brief Prints the tokens in a stream
     void print(std::ostream& out) const override;
 };
 
@@ -101,8 +108,10 @@ class IfOperation : public Element
     ~IfOperation();
     IfOperation& operator=(const IfOperation& other);
 
+    /// @brief Copies the value, not the pointer
     IfOperation* clone() const override;
 
+    /// @brief Prints the tokens in a stream
     void print(std::ostream& out) const override;
 };
 
@@ -118,6 +127,7 @@ class ListOperation : public Element
     ListOperation(const Token* token, const std::vector<Element*>& elements);
     ~ListOperation();
 
+    /// @brief Prints the tokens in a stream
     void print(std::ostream& out) const override;
 };
 
@@ -131,6 +141,7 @@ class MapOperation : public Element
     MapOperation(const Token* token, const Element* factor, const Element* list);
     ~MapOperation();
 
+    /// @brief Prints the tokens in a stream
     void print(std::ostream& out) const override;
 };
 
@@ -150,7 +161,9 @@ class UserFunc : public Element
     UserFunc& operator=(const UserFunc& other);
     ~UserFunc();
 
+    /// @brief Copies the value, not the pointer
     UserFunc* clone() const override;
 
+    /// @brief Prints the tokens in a stream
     void print(std::ostream& out) const override;
 };

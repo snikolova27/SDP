@@ -10,6 +10,7 @@ class Token
     Type type;
     Token(const Type type);
 
+    /// @brief Prints the token in a given stream
     virtual void print(std::ostream& out) const;
 };
 
@@ -20,6 +21,7 @@ class FunctionT : public Token
     std::string name;
     FunctionT(const std::string& name);
 
+    /// @brief Prints the token in a given stream
     void print(std::ostream& out) const override;
 } ;
 
@@ -30,6 +32,7 @@ class NumberT : public Token
     double value;
     NumberT(const double value);
 
+    /// @brief Prints the token in a given stream
     void print(std::ostream& out) const override;
 };
 
@@ -40,6 +43,7 @@ class ArgumentT : public Token
     unsigned value;
     ArgumentT(const unsigned value);
     
+    /// @brief Prints the token in a given stream
     void print(std::ostream& out) const override;    
 };
 
