@@ -2,6 +2,7 @@
 #include "commandTokens.h"
 #include "exceptions.h"
 #include "expressionElements.h"
+#include <new>
 #include <ostream>
 
 Analyzer::Analyzer(const std::vector<Token*>& tokens) : tokens(tokens), idx(-1)
@@ -143,6 +144,31 @@ Element* Analyzer :: expression(std::ostream& out)
 
             return new ListOperation(op, args); // return the list operation and its arguments
         } 
+        else if(funcPtr && funcPtr->name == MAP)    // we have found a map declaration
+        {
+            this->next();
+            return new MapOperation(op, this->expression(out), this->expression(out));
+        }
+
+        if(idx == -1 || type != Type::OPENING_BRACKET)
+        {
+            if(type == Type::ARROW) // we have found a user defined function
+            {
+                this->next();
+                return new UserFunc(op, nullptr, {});
+            }
+
+            if(type == Type::COMMA || type == Type::CLOSING_BRACKET)
+            {
+                this->next();
+                return new UserFunc(op, nullptr, {});
+            }
+
+            if(idx != -1)
+            {
+                
+            }
+        }
     }
     return nullptr;
 }
