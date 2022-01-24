@@ -6,7 +6,10 @@
 class Element
 {
     private:
+    /// @brief Helper function for the copy constructor
     void copy(const Element& other);
+
+    /// @brief Helper function for the destructor
     void deallocate();
 
     public:
@@ -76,7 +79,9 @@ class BinaryOperation : public Element
     private:
     const Element* left;
     const Element* right;
-    void freePointers();
+
+    /// @brief Helper function for the destructor
+    void deallocate();
 
     public:
     BinaryOperation(const Token* token, const Element* left, const Element* right);
@@ -99,7 +104,10 @@ class IfOperation : public Element
     const Element* right;
     const Element* condition;
 
+    /// @brief Helper function for the copy constructor
     void copy(const IfOperation& other);
+
+    /// @brief Helper function for the destructor
     void deallocate();
     
     public:
@@ -121,6 +129,7 @@ class ListOperation : public Element
     private:
     std::vector<Element*> list; 
 
+    /// @brief Helper function for the destructor
     void deallocate();
 
     public:
@@ -150,9 +159,12 @@ class UserFunc : public Element
 {
     private:
     const Element* definition;
-    std::vector<const Element*> args;
+    std::vector<const Element*> args;  // using a vector because of its constant access time
 
+    /// @brief Helper function for the copy constructor
     void copy(const UserFunc& other);
+
+    /// @brief Helper function for the destructor
     void deallocate();
 
     public:

@@ -1,18 +1,25 @@
 #include "commandTokens.h"
 #include "expressionElements.h"
 #include "types.h"
-#include <ostream>
+#include <iostream>
+
+const std::string LIST = "list";
+const std::string MAP = "map"; 
 
 // Used to analyze the different parts of an expression and figure out their roles
 class Analyzer
 {
     private:
-    std::vector<Token*> tokens;
-    Type currentT;      // type of current token
-    int idx;            // index of that current token
+    std::vector<Token*> tokens; // using a vector because of its constant element access time since we are 
+                                // looking at its elements while analyzing the input
+    Type currentT;              // type of current token
+    int idx;                    // index of that current token
 
     /// @brief Increments the current index and if it is valid - set the current type to the type at thqat index
     void next();
+
+    /// @brief Helper function for the destructor
+    void deallocate();
 
     /// @brief Returns a factor Element if the current index is valid, otherwise print an error in the stream
     /// @param - out - error stream
