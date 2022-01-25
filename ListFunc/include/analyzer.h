@@ -1,3 +1,4 @@
+#pragma once
 #include "commandTokens.h"
 #include "expressionElements.h"
 #include "types.h"

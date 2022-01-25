@@ -100,10 +100,6 @@ class BinaryOperation : public Element
 class IfOperation : public Element
 {
     private:
-    const Element* left;
-    const Element* right;
-    const Element* condition;
-
     /// @brief Helper function for the copy constructor
     void copy(const IfOperation& other);
 
@@ -111,6 +107,10 @@ class IfOperation : public Element
     void deallocate();
     
     public:
+    const Element* left;
+    const Element* right;
+    const Element* condition;
+
     IfOperation(const Token* token, const Element* left, const Element* right, const Element* condition);
     IfOperation(const IfOperation& other);
     ~IfOperation();
@@ -127,12 +127,12 @@ class IfOperation : public Element
 class ListOperation : public Element
 {
     private:
-    std::vector<Element*> list; 
-
     /// @brief Helper function for the destructor
     void deallocate();
 
     public:
+    std::vector<Element*> list; 
+
     ListOperation(const Token* token, const std::vector<Element*>& elements);
     ~ListOperation();
 
