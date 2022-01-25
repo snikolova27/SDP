@@ -4,7 +4,8 @@
 #include <iostream>
 
 const std::string LIST = "list";
-const std::string MAP = "map"; 
+const std::string MAP = "map";
+const std::string IF = "if"; 
 
 // Used to analyze the different parts of an expression and figure out their roles
 class Analyzer

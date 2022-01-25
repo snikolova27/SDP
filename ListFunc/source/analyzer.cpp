@@ -2,6 +2,7 @@
 #include "commandTokens.h"
 #include "exceptions.h"
 #include "expressionElements.h"
+#include <cstddef>
 #include <new>
 #include <ostream>
 
@@ -49,6 +50,11 @@ Element* Analyzer::factor(std::ostream& out)
 
     InvalidSyntax("A number was expected but it was not given").print(out); // print error if a factor is not found
     return nullptr; 
+}
+
+Element* Analyzer::analyze(std::ostream& out)
+{
+    return this->idx == -1 ? nullptr : this->expression(out);
 }
 
 Element* Analyzer :: expression(std::ostream& out)
@@ -144,12 +150,15 @@ Element* Analyzer :: expression(std::ostream& out)
 
             return new ListOperation(op, args); // return the list operation and its arguments
         } 
+
+        // -------- МАP --------
         else if(funcPtr && funcPtr->name == MAP)    // we have found a map declaration
         {
             this->next();
             return new MapOperation(op, this->expression(out), this->expression(out));
         }
 
+        // -------- USER FUNCTION --------
         if(idx == -1 || type != Type::OPENING_BRACKET)
         {
             if(type == Type::ARROW) // we have found a user defined function
@@ -166,9 +175,135 @@ Element* Analyzer :: expression(std::ostream& out)
 
             if(idx != -1)
             {
-                
+                InvalidSyntax("An opening bracket '(' was expected or a list. Input was ").print(out);
+                this->tokens[idx]->print(out);
+                out << std::endl;
+                return nullptr;
+            }
+
+            return new UserFunc(op, nullptr, {});
+        }
+
+        this->next(); // move onto next token
+
+        if(idx == -1)   // we have reached the end of the input
+        {
+            InvalidSyntax("Input ends too soon.").print(out);
+            return nullptr;
+        }
+
+        // -------- LEFT SIDE OF EXPRESSION --------
+        Element* leftSide;
+
+        switch(type)
+        {
+            case Type::NAME_OF_FUNCTION:
+            {
+                leftSide = this->expression(out); 
+                this->next(); // move on
+                break;
+            }
+            case Type::NUMBER:
+            {
+                leftSide = this->expression(out); // get the number
+                break;
+            }
+            case Type::ARGUMENT:
+            {
+                leftSide = new ArgElement(this->tokens[idx]); // save the argument
+                this->next(); // move on
+                break;
+            }
+            default:
+            {
+                return new UserFunc(op, this->expression(out), {});
             }
         }
+
+        if(idx == -1)
+        {
+             InvalidSyntax("A comma ',' was expected.").print(out);
+             return nullptr;
+        }
+
+        if(type != Type::COMMA)
+        {
+            if(type == Type::CLOSING_BRACKET)   // found an unary operation
+            {
+                return new UnaryOperation(op, leftSide);
+            }
+
+            InvalidSyntax("A comma was expected ','. Input was: ").print(out);
+            this->tokens[idx]->print(out);
+            out << std::endl;
+            return nullptr;
+        }
+
+        this->next(); // move onto next token
+
+        // -------- RIGHT SIDE OF EXPRESSION --------
+        Element* rightSide;
+        
+        switch(type)
+        {
+            case Type::NAME_OF_FUNCTION:
+            {
+                rightSide = this->expression(out); 
+                this->next(); // move on
+                break;
+            }
+
+            case Type::ARGUMENT:
+            {
+                rightSide = new ArgElement(this->tokens[idx]); // save the argument
+                this->next(); // move on
+                break;
+            }
+            default:
+            {
+                rightSide = this->factor(out);
+            }
+        }
+
+        if(idx != -1 && type != Type::CLOSING_BRACKET)
+        {
+                if(type == Type::COMMA)
+                {
+                    FunctionT* funcPt = dynamic_cast<FunctionT*>(op);
+                    if(funcPt && funcPt->name == IF) // found an if expression
+                    {
+                        this->next(); // move on
+                        return new IfOperation(funcPt, leftSide, rightSide, this->expression(out));
+                    }
+                    else 
+                    {
+                        this->next(); // look at next token
+                        std::vector<const Element*> args;
+                        args.push_back(leftSide);
+                        args.push_back(rightSide);
+                        Element* nextArg = this->expression(out);
+
+                        while(nextArg)  // find all arguments
+                        {
+                            args.push_back(nextArg);
+                            this->next();
+                            if(type == Type::COMMA)
+                            {
+                                this->next();
+                            }
+                            nextArg = this->expression(out);
+                        }
+
+                        return new UserFunc(op, nullptr, args);
+                    }
+                }
+            
+            InvalidSyntax("A closing bracket ')' was expected. Input was: ").print(out);
+            this->tokens[idx]->print(out);
+            out << std::endl;
+            return nullptr;
+        }
+            return new BinaryOperation(op, leftSide, rightSide);  // we have found a binary operation
     }
-    return nullptr;
+   return this->factor(out);    // we have found a factor element
 }

@@ -176,13 +176,13 @@ void UnaryOperation::print(std::ostream& out) const
  }
  BinaryOperation::~BinaryOperation()
  {
-    this->freePointers();
+    this->deallocate();
  }
 BinaryOperation& BinaryOperation:: operator=(const BinaryOperation& other)
 {
     if( this != &other)
     {
-      this->freePointers();
+      this->deallocate();
       Element::operator=(other);
       this->left = other.left->clone();
       this->right = other.left->clone();
@@ -205,7 +205,7 @@ void BinaryOperation::print(std::ostream& out) const
     out << ")";
 }
 
-void BinaryOperation::freePointers()
+void BinaryOperation::deallocate()
 {
     delete this->left;
     this->left = nullptr;
