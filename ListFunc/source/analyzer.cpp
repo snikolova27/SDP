@@ -90,10 +90,10 @@ Element* Analyzer :: expression(std::ostream& out)
         if(funcPtr && funcPtr->name == LIST)    // we are looking at a list function declaration
         {
             if(idx == -1 || type != Type::OPENING_BRACKET)  // idx == -1 means we have reached the end 
-                                                                    // of the tokens vector, if the current type
-                                                                    // is not an opening bracket that means we 
-                                                                    // have found a syntax error
-                                                                    // list(<args>) - the right syntax
+                                                            // of the tokens vector, if the current type
+                                                            // is not an opening bracket that means we 
+                                                            // have found a syntax error
+                                                            // list(<args>) - the right syntax
             {
                 InvalidSyntax("An opening bracket '(' was expected after calling the list function.").print(out);
                 return nullptr;
