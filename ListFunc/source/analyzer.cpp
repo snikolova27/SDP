@@ -2,8 +2,6 @@
 #include "commandTokens.h"
 #include "exceptions.h"
 #include "expressionElements.h"
-#include <cstddef>
-#include <new>
 #include <ostream>
 
 Analyzer::Analyzer(const std::vector<Token*>& tokens) : tokens(tokens), idx(-1)

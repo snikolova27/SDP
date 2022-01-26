@@ -1,5 +1,6 @@
 #pragma once
 #include "analyzer.h"
+#include "predefinedFuncs.h"
 #include <stack>
 
 /// A class to interpret the functional language 

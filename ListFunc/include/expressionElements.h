@@ -57,10 +57,9 @@ class FactorElement : public Element
 // Class to store an unary operation and its argument
 class UnaryOperation : public Element
 {
-    private:
+    public:
     const Element* argument;
 
-    public:
     UnaryOperation(const Token* token, const Element* argument);
     UnaryOperation(const UnaryOperation& other);
     ~UnaryOperation();
@@ -77,13 +76,13 @@ class UnaryOperation : public Element
 class BinaryOperation : public Element
 {
     private:
-    const Element* left;
-    const Element* right;
-
     /// @brief Helper function for the destructor
     void deallocate();
 
     public:
+    const Element* left;
+    const Element* right;
+    
     BinaryOperation(const Token* token, const Element* left, const Element* right);
     BinaryOperation(const BinaryOperation& other);
     ~BinaryOperation();
@@ -142,11 +141,10 @@ class ListOperation : public Element
 
 class MapOperation : public Element
 {
-    private:
+    public:
     const Element* factor;
     const Element* list;
 
-    public:
     MapOperation(const Token* token, const Element* factor, const Element* list);
     ~MapOperation();
 
@@ -158,9 +156,6 @@ class MapOperation : public Element
 class UserFunc : public Element
 {
     private:
-    const Element* definition;
-    std::vector<const Element*> args;  // using a vector because of its constant access time
-
     /// @brief Helper function for the copy constructor
     void copy(const UserFunc& other);
 
@@ -168,6 +163,9 @@ class UserFunc : public Element
     void deallocate();
 
     public:
+    const Element* definition;
+    std::vector<const Element*> args;  // using a vector because of its constant access time
+    
     UserFunc(const Token* token, const Element* def, const std::vector<const Element*>& args);
     UserFunc(const UserFunc& other);
     UserFunc& operator=(const UserFunc& other);

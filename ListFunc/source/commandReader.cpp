@@ -1,6 +1,4 @@
 #include "commandReader.h"
-#include "exceptions.h"
-#include "utilities.h"
 
 commandReader::commandReader(const std::string& input) : input(input){};
 
@@ -33,7 +31,7 @@ bool commandReader::tokenize(std::vector<Token*>& tokens, std::ostream& errors)
 
         else if(isDigit(*it) || *it == '-') // we are searching for a number, could be a negative, could be a double/integer
         {
-            bool isNegative = false; // we will use it to mark if the number is negative, will be used for the result in the end
+           bool isNegative = false; // we will use it to mark if the number is negative, will be used for the result in the end
 
             if(*it == '-')
             {
@@ -183,9 +181,15 @@ bool commandReader::tokenize(std::vector<Token*>& tokens, std::ostream& errors)
             case '-':
             {
                 ++it;
+                while(*it == ' ' || *it == '\t')    // skipping spaces and tabs once again
+                {
+                    ++it;
+                }
+       
                 if(*it != '>')  // cannot make an arrow, we throw an error
                 {
-                    InvalidSyntax("No matching operator for '-").print(errors); // print the error in the errors stream
+                    errors << *it << std::endl;
+                    InvalidSyntax("No matching operator for '-'").print(errors); // print the error in the errors stream
                     tokens.clear(); // clean all tokens
                     return false; // input is not valid
                 }
@@ -224,3 +228,4 @@ bool commandReader::tokenize(std::vector<Token*>& tokens, std::ostream& errors)
 
     return true;
 }
+

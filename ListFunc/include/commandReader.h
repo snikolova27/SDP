@@ -2,7 +2,7 @@
 #include "exceptions.h"
 #include "commandTokens.h"
 #include "types.h"
-
+#include "utilities.h"
 #include <vector>
 
 /// @brief Will be used to read the input and tokenize it so we could interpret the input later.

@@ -5,7 +5,7 @@ include(CTest)
 enable_testing()
 
 add_library(Functional source/exceptions.cpp source/utilities.cpp source/commandTokens.cpp 
-            source/commandReader.cpp source/expressionElements.cpp source/interpreter.cpp)
+            source/commandReader.cpp source/expressionElements.cpp source/interpreter.cpp source/analyzer.cpp)
 target_include_directories(Functional PUBLIC include/)
 
 add_executable(ListFunc main.cpp)
