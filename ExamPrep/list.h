@@ -34,6 +34,20 @@ class List
 
     }
 
+    void push(Node* node)
+    {
+        if(!this->tail)
+        {
+            this->head = node;
+            this->tail = node;  
+        }
+        else 
+        {
+            this->tail->next = node;
+            this->tail = node;
+        }
+    }
+
     int getSize() const
     {
         return this->size;
