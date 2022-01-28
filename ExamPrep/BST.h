@@ -57,6 +57,75 @@ class BST
         }
     }
 
+    Node* find(const int value, Node* root)
+    {
+        if(!root)
+        {
+            return nullptr;
+        }
+        if(root->value == value)
+        {
+            return root;
+        }
+        if(value < root->value)
+        {
+            return this->find(value, root->left);
+        }
+        if(value > root -> value)
+        {
+            return this->find(value, root->right);
+        }
+    }
+
+    Node* extractMin(Node*& root)
+    {
+        if(root->left)
+        {
+            return extractMin(root->left);
+        }
+        Node* n = root;
+        root = root->right;
+        return n;
+    }
+    void erase(Node*& node)
+    {
+        Node* toDel = node;
+        if(!node->left)
+        {
+            node = node->right;
+        }
+        else if(!node->right)
+        {
+            node = node ->left;
+        }
+        else 
+        {
+            Node* mR;
+            if(!node->right->left)
+            {
+                mR = node->right;
+                node->right = mR->right;
+            }
+            else
+            {
+                Node* par = node->right;
+                mR = par->left;
+                while(mR->left)
+                {
+                    par = mR;
+                    mR = par->left;
+                }
+                par->left = mR->right;
+            }
+            mR = this->extractMin(node->right);
+            mR->left = node->left;
+            mR->right = node->right;
+            node = mR;
+        }
+        delete toDel;
+        return;
+    }
+
     public:
     std::vector<int> getEvenChildren(Node* root)
     {
@@ -112,7 +181,17 @@ class BST
         return this->root;
     }
 
+    Node* find(const int value)
+    {
+        return this->find(value, this->root);
+    }
 
-
-
+    void erase(const int value)
+    {
+        Node* toErase = this->find(value);
+        if(toErase)
+        {
+            this->erase(toErase);
+        }
+    }
 };

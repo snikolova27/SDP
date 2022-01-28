@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include "binaryTree.h"
+#include "BST.h"
 
 std::vector<int> readNums(std::istream & str)
 {
