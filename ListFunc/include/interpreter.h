@@ -41,13 +41,7 @@ class Interpreter
     /// @brief Print the contents of a list
     /// @param list - list to look at
     /// @param out - output and error stream
-    bool list(const ListOperation* list, std::ostream& out);
-
-    /// @brief Put the elements of the list in the vector and apply the function to them
-    /// @param map - map function
-    /// @param out - output and error stream
-    std::vector<Element*> map(const MapOperation* map, std::ostream& out);
-    
+    bool list(const ListOperation*& list, std::ostream& out);
 
     // -------- Handling functions --------
 

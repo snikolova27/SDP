@@ -25,7 +25,7 @@ void run(std::istream& in, std::ostream& out)
         out << "ListFunc > ";
         getline(in, input);
 
-        if(input == "exit") {break;}\
+        if(input == "exit") {break;}
 
         commandReader reader(input);
 
@@ -54,6 +54,4 @@ void run(std::istream& in, std::ostream& out)
 
         out << std::endl;
     }
-    out << std::endl << std::endl;
-
 }

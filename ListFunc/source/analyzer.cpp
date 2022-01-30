@@ -149,13 +149,6 @@ Element* Analyzer :: expression(std::ostream& out)
             return new ListOperation(op, args); // return the list operation and its arguments
         } 
 
-        // -------- МАP --------
-        else if(funcPtr && funcPtr->name == MAP)    // we have found a map declaration
-        {
-            this->next();
-            return new MapOperation(op, this->expression(out), this->expression(out));
-        }
-
         // -------- USER FUNCTION --------
         if(idx == -1 || type != Type::OPENING_BRACKET)
         {

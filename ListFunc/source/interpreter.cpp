@@ -66,10 +66,68 @@ bool Interpreter::lookAtIf(const IfOperation* op, std::ostream& out)
     return this->lookAt(op->left,out);
 }
 
-bool Interpreter::list(const ListOperation* list, std::ostream& out)
+bool Interpreter::list(const ListOperation*& list, std::ostream& out)
 {
-    out << '[';
     auto it = list->list.begin();
+    const int size = list->list.size();
+
+    if(size == 1)
+    {
+        if(!this->lookAt(*it, out)) {return false;}        
+        out  << "the list is infinite, starting from " << this->results.top() << " with a step of 1";
+        this->results.pop();
+        return true;
+    }
+    if(size == 2)
+    {
+        if(!this->lookAt(*it,out)) {return false;}
+        out << "the list is infinite, starting from " << this->results.top();
+        this->results.pop();
+        ++it;
+
+        if(!this->lookAt(*it,out)) {return false;}
+        out << " with a step of " << this->results.top();
+        this->results.pop();
+        return true;
+    }
+
+    if( size == 3)
+    {
+        if(!this->lookAt(*it,out)) {return false;}
+        const auto start = this->results.top();
+        this->results.pop();
+        ++it;
+
+        if(!this->lookAt(*it,out)) {return false;}
+        const auto step = this->results.top();
+        this->results.pop();
+        ++it;
+        
+        if(!this->lookAt(*it,out)) {return false;}
+        const auto cnt = this->results.top();
+        this->results.pop();
+
+        if(cnt != int(cnt)) //count of elements in list should be a whole number
+        {
+            return false;
+        }
+        
+        auto current = start;
+        //now we make the list
+        for(int i = 0; i < cnt; i++)
+        {
+            Element* elem = new Element(new NumberT(current));
+           
+        }
+      
+           
+
+       
+
+
+    }
+    
+    out << "[";
     for(it;it + 1 != list->list.end(); ++it)
     {
         if(!this->lookAt(*it, out)) {return false;}
@@ -83,87 +141,6 @@ bool Interpreter::list(const ListOperation* list, std::ostream& out)
   
     return true;
 }
-
-std::vector<Element*>  Interpreter::map(const MapOperation* map, std::ostream& out)
-{
-    const FunctionT* funcName = dynamic_cast<const FunctionT*>(map->list->token);
-    const FunctionT* listName = dynamic_cast<const FunctionT*>(map->factor->token);
-
-    if(!funcName || !listName)
-    {
-        RunTime("Could not deduce function.").print(out);
-        return {};
-    }
-
-    // finding the pointers
-    const UserFunc* mapPtr = nullptr;
-    const ListOperation* listPtr = nullptr;
-
-    int j = 0;
-    for(auto it = this->funcs.begin(); it != this->funcs.end(); ++it)
-    {
-        const UserFunc* currentFunc = dynamic_cast<const UserFunc*>(*it);
-        if(currentFunc)
-        {
-            const FunctionT* currentName = dynamic_cast<const FunctionT*>(currentFunc->token);
-            if(currentName->name == funcName->name || currentName->name == listName->name)
-            {
-                if(currentName->name == funcName->name) // found the name of the function
-                {
-                    mapPtr = dynamic_cast<const UserFunc*>(currentFunc);
-                    j++;
-                }
-                else 
-                {
-                    listPtr = dynamic_cast<const ListOperation*>(currentFunc->definition);
-                    ++j;
-                }
-            }
-        }
-
-        if(j == 2)  // function and map argument found
-        {
-            break;
-        }
-    }
-
-    if(j < 2)
-    {
-        RunTime("Could not find matching function definition.").print(out);
-        return {};
-    }
-
-    std::vector<Element*> elements;
-
-    if(listPtr && mapPtr)
-    {
-        for(auto it = listPtr->list.begin(); it != listPtr->list.end(); ++it)
-        {
-            if(!this->lookAt(*it, out)) // if contents of list make an error occur
-            {
-                return {};
-            }
-
-            this->args.push_back(this->results.top());
-            this->results.pop();
-
-            if(!lookAt(mapPtr->definition, out)) // if there is a problem with the definition
-            {
-                return {};
-            }
-
-            ++this->idx;
-            elements.push_back(new FactorElement(new NumberT(this->results.top())));
-            this->results.pop();
-
-            --this->idx;
-            this->args.pop_back();
-        }
-    }
-
-    return elements;
-}
-
  bool Interpreter::unary(const UnaryOperation* op, std::ostream& out)
  {
      const FunctionT* funcToken = dynamic_cast<const FunctionT*>(op->token);
@@ -174,19 +151,28 @@ std::vector<Element*>  Interpreter::map(const MapOperation* map, std::ostream& o
         this->results.push(sqrt(arg));
         return true;
      }
-     if(funcToken->name == SIN)
-     {
-        auto arg = this->results.top();
-        this->results.pop();
-        this->results.push(sin(arg));
-        return true;
-     }
-    if(funcToken->name == COS)
+
+    if ( funcToken->name == INT)
     {
         auto arg = this->results.top();
         this->results.pop();
-        this->results.push(cos(arg));
+        this->results.push(int(arg));
         return true;
+    }
+
+    if(funcToken->name == WRITE)
+    {
+        auto arg = this->results.top();
+        this->results.pop();
+        out << arg;
+        return true;
+    }
+
+    if(funcToken-> name == HEAD)
+    {
+        auto arg = this->results.top();
+        this->results.pop();
+    
     }
 
     for(auto it = this->funcs.begin(); it != this->funcs.end(); ++it)
@@ -256,6 +242,31 @@ bool Interpreter::binary(const BinaryOperation* op, std::ostream& out)
         }
         this->results.push(leftSide / rightSide);
         return true;
+    }
+    if(name == MOD)
+    {
+        int valR = int(rightSide);  // cast them to int to see if they are whole numbers
+        int valL = int(leftSide);
+        if(valR == rightSide && valL == leftSide)
+        {
+            if(valR != 0)
+            {
+                this->results.push(valR % valL);
+                return true;
+            }
+            else 
+            {
+                this->results.push(valL);
+                return true;
+            }
+           
+        }
+        else 
+        {
+            RunTime("Mod function cannot be applied to non-whole numbers.").print(out);
+            return false;
+        }
+       
     }
     if(name == POW)
     {
@@ -366,7 +377,7 @@ bool Interpreter::binary(const BinaryOperation* op, std::ostream& out)
      }
 
      if(!op->definition)
-     {
+     {   
          RunTime("Expected '->'").print(out);
          return false;
      }
@@ -446,15 +457,6 @@ bool Interpreter::binary(const BinaryOperation* op, std::ostream& out)
     if(listPtr)
     {
         return this->list(listPtr, out);
-    }
-
-    const MapOperation* mapPtr = dynamic_cast<const MapOperation*>(syntaxTree);
-    if(mapPtr)
-    {
-        ListOperation* listN = new ListOperation(new Token(mapPtr->factor->token->type), this->map(mapPtr, out));
-        bool check = this->lookAt(listN, out);
-        delete listN;
-        return check; 
     }
 
     const UserFunc* userFunc = dynamic_cast<const UserFunc*>(syntaxTree);

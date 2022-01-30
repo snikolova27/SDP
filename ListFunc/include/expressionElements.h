@@ -139,19 +139,6 @@ class ListOperation : public Element
     void print(std::ostream& out) const override;
 };
 
-class MapOperation : public Element
-{
-    public:
-    const Element* factor;
-    const Element* list;
-
-    MapOperation(const Token* token, const Element* factor, const Element* list);
-    ~MapOperation();
-
-    /// @brief Prints the tokens in a stream
-    void print(std::ostream& out) const override;
-};
-
 // Class to store user defined functions and their arguments
 class UserFunc : public Element
 {

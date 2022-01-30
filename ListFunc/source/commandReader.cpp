@@ -16,7 +16,7 @@ bool commandReader::tokenize(std::vector<Token*>& tokens, std::ostream& errors)
             ++it;
         }
 
-        if(isLetter(*it))  // we are searching for a name of a function or a list, they only consist of letter
+        if(isLetter(*it))  // we are searching for a name of a function or a list, they only consist of letters
         {
             std::string name;
             do 

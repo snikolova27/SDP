@@ -298,30 +298,6 @@ void ListOperation::deallocate()
     }
 }
 
-// --------Map operation --------
-MapOperation::MapOperation(const Token*token, const Element* factor, const Element* list) : 
-                                                                    Element(token), factor(factor), list(list) {}
-MapOperation::~MapOperation()
-{
-    delete this->factor;
-    this->factor = nullptr;
-}
-
-void MapOperation::print(std::ostream& out) const
-{
-    if(!this->factor || !this->list)
-    {
-        return;
-    }
-    out << "(";
-    Element::print(out);
-    out << " ";
-    this->factor->print(out);
-    out << " ";
-    this->list->print(out);
-    out << ")";
-}
-
 // --------User defined functions --------
 UserFunc::UserFunc(const Token* token, const Element* def, const std::vector<const Element*>& args) :
                                                 Element(token), definition(def), args(args) {}
