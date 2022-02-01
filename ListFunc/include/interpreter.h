@@ -1,6 +1,7 @@
 #pragma once
 #include "analyzer.h"
 #include "predefinedFuncs.h"
+#include "list.h"
 #include <stack>
 
 /// A class to interpret the functional language 
@@ -16,6 +17,8 @@ class Interpreter
 
     std::vector<const Element*> funcs; // storing pointers to the user defined functions here 
                                        // using a vector once again for the same reason as above
+
+    std::stack<LinkedList> lists; // storing the lists here, will always return the last one 
     
     /// @brief Casting the element to every possible type so we figure out its type and
     /// calling the corresponding lookAt or funtion handling function

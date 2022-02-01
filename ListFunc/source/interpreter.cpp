@@ -2,7 +2,6 @@
 #include "commandTokens.h"
 #include "exceptions.h"
 #include "expressionElements.h"
-#include "predefinedFuncs.h"
 #include <cmath>
 
 Interpreter::Interpreter() : idx(0) {}
@@ -73,38 +72,57 @@ bool Interpreter::list(const ListOperation*& list, std::ostream& out)
 
     if(size == 1)
     {
-        if(!this->lookAt(*it, out)) {return false;}        
+        if(!this->lookAt(*it, out)) {return false;}
+        auto element = this->results.top();        
         out  << "the list is infinite, starting from " << this->results.top() << " with a step of 1";
         this->results.pop();
+
+        // create the list, head is the element given, step is 1
+        LinkedList toAdd;
+        toAdd.push(element);
+        toAdd.push(1);
+        toAdd.makeInfinite();   // making it infinite, will not keep of its elements
+
+        this->lists.push(toAdd);    // add it to the stack of lists we are saving
         return true;
     }
     if(size == 2)
     {
         if(!this->lookAt(*it,out)) {return false;}
+        auto start = this->results.top();
         out << "the list is infinite, starting from " << this->results.top();
         this->results.pop();
         ++it;
 
         if(!this->lookAt(*it,out)) {return false;}
+        auto step = this->results.top();
         out << " with a step of " << this->results.top();
         this->results.pop();
+
+        // create the list, head is the start element, step is the second argument
+        LinkedList toAdd;
+        toAdd.push(start);
+        toAdd.push(step);
+        toAdd.makeInfinite();
+
+        this->lists.push(toAdd);
         return true;
     }
 
     if( size == 3)
     {
         if(!this->lookAt(*it,out)) {return false;}
-        const auto start = this->results.top();
+        auto cnt = this->results.top();
         this->results.pop();
         ++it;
 
         if(!this->lookAt(*it,out)) {return false;}
-        const auto step = this->results.top();
+        auto step = this->results.top();
         this->results.pop();
         ++it;
         
         if(!this->lookAt(*it,out)) {return false;}
-        const auto cnt = this->results.top();
+        auto start = this->results.top();
         this->results.pop();
 
         if(cnt != int(cnt)) //count of elements in list should be a whole number
@@ -113,33 +131,36 @@ bool Interpreter::list(const ListOperation*& list, std::ostream& out)
         }
         
         auto current = start;
+
         //now we make the list
-        for(int i = 0; i < cnt; i++)
+        LinkedList toAdd;
+
+        for(int i = 0; i <= cnt; i++)    // create the list
         {
-            Element* elem = new Element(new NumberT(current));
-           
+            toAdd.push(start);
+            start +=step;           
         }
-      
-           
+        this->lists.push(toAdd); // store the newly created list
 
-       
-
-
-    }
+        auto head = toAdd.getHead();
+        out << "[";
+        for(int i = 0; i <= cnt;i++)
+        {
+            out << head->value;
+            if(i != cnt)
+            {
+                out << " ";
+            }
+            head = head = head->next;
+        }
+        out << "]";
     
-    out << "[";
-    for(it;it + 1 != list->list.end(); ++it)
-    {
-        if(!this->lookAt(*it, out)) {return false;}
-        out << this->results.top() << ", ";
-        this->results.pop();
+        return true;    
     }
-    if(!this->lookAt(*it,out)) {return false;}
 
-    out << this->results.top() << "]";
-    this->results.pop();
-  
-    return true;
+    // count of arguments is not valid, we throw an error
+    RunTime("Expected count of arguemnts is 1, 2 or 3.").print(out);
+    return false;
 }
  bool Interpreter::unary(const UnaryOperation* op, std::ostream& out)
  {
@@ -170,8 +191,18 @@ bool Interpreter::list(const ListOperation*& list, std::ostream& out)
 
     if(funcToken-> name == HEAD)
     {
-        auto arg = this->results.top();
+        auto arg = this->lists.top();
         this->results.pop();
+        if(arg.isInfinite())
+        {
+            out << "the list is infinite with a head of " << arg.getHead()->value << std::endl;
+            return true;
+        }
+        else 
+        {
+            out << arg.getHead()->value << std::endl;
+            return true;
+        }
     
     }
 
