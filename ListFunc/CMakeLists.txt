@@ -12,6 +12,9 @@ target_include_directories(Functional PUBLIC include/)
 add_executable(ListFunc main.cpp)
 target_link_libraries(ListFunc Functional)
 
+# add_executable(Tests tests/interpreterTests.cpp)
+# target_link_libraries(Tests Functional)
+
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)

@@ -2,6 +2,7 @@
 #include "commandTokens.h"
 #include "exceptions.h"
 #include "expressionElements.h"
+#include "list.h"
 #include <cmath>
 
 Interpreter::Interpreter() : idx(0) {}
@@ -70,7 +71,7 @@ bool Interpreter::list(const ListOperation*& list, std::ostream& out)
     auto it = list->list.begin();
     const int size = list->list.size();
 
-    if(size == 1)
+    if(size == 1 && !list->userInput)
     {
         if(!this->lookAt(*it, out)) {return false;}
         auto element = this->results.top();        
@@ -86,7 +87,22 @@ bool Interpreter::list(const ListOperation*& list, std::ostream& out)
         this->lists.push(toAdd);    // add it to the stack of lists we are saving
         return true;
     }
-    if(size == 2)
+
+    if(size == 1 && list->userInput)    // list created using []
+    {
+        if(!this->lookAt(*it, out)) {return false;}
+        auto element = this->results.top();        
+        out  << "[ " << this->results.top() << " ]";
+        this->results.pop();
+
+        // create the list, head and tail are the element given
+        LinkedList toAdd;
+        toAdd.push(element);
+
+        this->lists.push(toAdd); // add it to the stack of lists we are saving
+        return true;
+    } 
+    if(size == 2 && !list->userInput)
     {
         if(!this->lookAt(*it,out)) {return false;}
         auto start = this->results.top();
@@ -109,10 +125,32 @@ bool Interpreter::list(const ListOperation*& list, std::ostream& out)
         return true;
     }
 
-    if( size == 3)
+     if(size == 2 && list->userInput) // list created []
     {
         if(!this->lookAt(*it,out)) {return false;}
-        auto cnt = this->results.top();
+        auto first = this->results.top();
+        this->results.pop();
+        ++it;
+
+        if(!this->lookAt(*it,out)) {return false;}
+        auto snd = this->results.top();
+        this->results.pop();
+
+        out << "[" << first << ", " << snd << "]" ;
+
+        // create the list, head is the first  element, step is the second argument
+        LinkedList toAdd;
+        toAdd.push(first);
+        toAdd.push(snd);
+
+        this->lists.push(toAdd);
+        return true;
+    }
+
+    if( size == 3 && !list->userInput)
+    {
+        if(!this->lookAt(*it,out)) {return false;}
+        auto start = this->results.top();
         this->results.pop();
         ++it;
 
@@ -122,7 +160,7 @@ bool Interpreter::list(const ListOperation*& list, std::ostream& out)
         ++it;
         
         if(!this->lookAt(*it,out)) {return false;}
-        auto start = this->results.top();
+        auto cnt = this->results.top();
         this->results.pop();
 
         if(cnt != int(cnt)) //count of elements in list should be a whole number
@@ -135,7 +173,7 @@ bool Interpreter::list(const ListOperation*& list, std::ostream& out)
         //now we make the list
         LinkedList toAdd;
 
-        for(int i = 0; i <= cnt; i++)    // create the list
+        for(int i = 0; i < cnt; i++)    // create the list
         {
             toAdd.push(start);
             start +=step;           
@@ -144,10 +182,10 @@ bool Interpreter::list(const ListOperation*& list, std::ostream& out)
 
         auto head = toAdd.getHead();
         out << "[";
-        for(int i = 0; i <= cnt;i++)
+        for(int i = 0; i < cnt;i++)
         {
             out << head->value;
-            if(i != cnt)
+            if(i != cnt - 1)
             {
                 out << " ";
             }
@@ -157,12 +195,100 @@ bool Interpreter::list(const ListOperation*& list, std::ostream& out)
     
         return true;    
     }
+    if( size == 3 && list->userInput) // list created using []
+    {
+        if(!this->lookAt(*it,out)) {return false;}
+        auto first = this->results.top();
+        this->results.pop();
+        ++it;
+
+        if(!this->lookAt(*it,out)) {return false;}
+        auto snd = this->results.top();
+        this->results.pop();
+        ++it;
+        
+        if(!this->lookAt(*it,out)) {return false;}
+        auto third = this->results.top();
+        this->results.pop();
+           
+        //now we make the list
+        LinkedList toAdd;
+        toAdd.push(first);
+        toAdd.push(snd);
+        toAdd.push(third);      
+      
+        this->lists.push(toAdd); // store the newly created list
+
+        auto head = toAdd.getHead();
+        out << "[";
+        for(int i = 0; i < 3;i++)
+        {
+            out << head->value;
+            if(i != 2)
+            {
+                out << " ";
+            }
+            head = head = head->next;
+        }
+        out << "]";
+    
+        return true;    
+    }
+    if(size >= 4 && list->userInput) // longer list created using []
+    {
+        LinkedList toAdd;
+        int currentSize = 0;
+        while(currentSize <= size)  // getting all the elements of the list
+        {
+            if(!this->lookAt(*it,out)) {return false;}
+            auto elem = this->results.top();
+            this->results.pop();
+            toAdd.push(elem);
+            ++it;
+            currentSize++;
+        }
+        this->lists.push(toAdd);
+
+        auto head = toAdd.getHead();
+        out << "[";
+        for(int i = 0; i <= size; i++)
+        {
+            out << head->value;
+            if(i != size)
+            {
+                out << ", ";
+            }
+            head = head->next;
+        }
+        out << "]";
+        return true;
+        
+    }
 
     // count of arguments is not valid, we throw an error
-    RunTime("Expected count of arguemnts is 1, 2 or 3.").print(out);
+    RunTime("Expected count of arguments is 1, 2 or 3 when using the list function.").print(out);
     return false;
 }
- bool Interpreter::unary(const UnaryOperation* op, std::ostream& out)
+// bool Interpreter::length( const Length* & lenOp, std::ostream& out)
+// {
+//     auto list = lenOp->list;
+//     int size = list.size();
+//     bool user = lenOp->listOp->userInput;
+
+//     if(!user)
+//     {
+//         if(size == 1 || size == 2)
+//         {
+//             out << "length of this list is infinite";
+//             return true;
+//         } 
+//     }
+//     out << size;
+//     return true;
+    
+// }
+
+bool Interpreter::unary(const UnaryOperation* op, std::ostream& out)
  {
      const FunctionT* funcToken = dynamic_cast<const FunctionT*>(op->token);
      if(funcToken ->name == SQRT)
@@ -189,18 +315,28 @@ bool Interpreter::list(const ListOperation*& list, std::ostream& out)
         return true;
     }
 
+    if(funcToken->name == LENGTH)
+    {
+       
+    }
+
     if(funcToken-> name == HEAD)
     {
+        out << this->lists.size() << std::endl;
         auto arg = this->lists.top();
         this->results.pop();
         if(arg.isInfinite())
         {
-            out << "the list is infinite with a head of " << arg.getHead()->value << std::endl;
+            auto lastList = this->lists.top();
+            this->lists.pop();
+            out << "the list is infinite with a head of " << lastList.getHead()->value << std::endl;
             return true;
         }
         else 
         {
-            out << arg.getHead()->value << std::endl;
+            auto lastList = this->lists.top();
+            this->lists.pop();
+            out << lastList.getHead()->value << std::endl;
             return true;
         }
     
@@ -497,6 +633,12 @@ bool Interpreter::binary(const BinaryOperation* op, std::ostream& out)
         return true;
     }
 
+    // const Length* lenOp = dynamic_cast<const Length*>(syntaxTree);
+    // if(lenOp)
+    // {
+    //     return this->length(lenOp,out);
+    // }
+
     RunTime("Could not find matching function definition").print(out);
     return false;
  }
@@ -524,4 +666,9 @@ void Interpreter::interpret(const Element* syntaxTree, std::ostream& out)
     {
         RunTime("Argument was unexpected.").print(out);
     }
+}
+
+std::stack<double> Interpreter::getResults() const
+{
+    return this->results;
 }

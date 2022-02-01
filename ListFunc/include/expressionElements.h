@@ -131,12 +131,20 @@ class ListOperation : public Element
 
     public:
     std::vector<Element*> list; 
+    bool userInput = false;
 
-    ListOperation(const Token* token, const std::vector<Element*>& elements);
+    ListOperation(const Token* token, const std::vector<Element*>& elements, bool user = false);
     ~ListOperation();
 
     /// @brief Prints the tokens in a stream
     void print(std::ostream& out) const override;
+};
+
+class Length : public Element
+{
+    public:
+    std::vector<Element*> list;
+    Length(const Token* token, const std::vector<Element*>& list);
 };
 
 // Class to store user defined functions and their arguments

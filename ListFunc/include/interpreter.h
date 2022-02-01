@@ -46,6 +46,11 @@ class Interpreter
     /// @param out - output and error stream
     bool list(const ListOperation*& list, std::ostream& out);
 
+    /// @brief Print the length of a list
+    /// @param lenOp - length operation to look at
+    /// @param out - out[ut and error stream
+    //bool length(const Length* & lenOp, std::ostream& out);
+
     // -------- Handling functions --------
 
     ///@brief Look at an unary function. If it is not used defined - pushes the result
@@ -74,4 +79,7 @@ class Interpreter
     /// @param syntaxTree - element to look at
     /// @param out - output and error stream
     void interpret(const Element* syntaxTree, std::ostream& out);
+
+    /// @brief Used for testing
+    std::stack<double> getResults() const;
 };

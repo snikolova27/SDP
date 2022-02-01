@@ -269,7 +269,7 @@ void IfOperation::print(std::ostream& out) const
 }
 
 // --------List operation --------
-ListOperation::ListOperation(const Token* token, const std::vector <Element*>& elements) : Element(token), list(elements) {}
+ListOperation::ListOperation(const Token* token, const std::vector <Element*>& elements,bool user) : Element(token), list(elements), userInput(user) {}
 ListOperation::~ListOperation()
 {
     this->deallocate();
@@ -297,6 +297,9 @@ void ListOperation::deallocate()
         this->list[i] = nullptr;
     }
 }
+
+// --------Length operation --------
+Length::Length(const Token* token,const std::vector<Element*>& list) :Element(token), list(list) {}
 
 // --------User defined functions --------
 UserFunc::UserFunc(const Token* token, const Element* def, const std::vector<const Element*>& args) :

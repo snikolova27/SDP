@@ -2,6 +2,7 @@
 #include "commandTokens.h"
 #include "expressionElements.h"
 #include "types.h"
+#include "list.h"
 #include <iostream>
 
 const std::string LIST = "list";
