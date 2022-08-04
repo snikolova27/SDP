@@ -1,10 +1,11 @@
 #include <iostream>
 #include "../include/n-aryTree.h"
 
-int main(int argc, char** argv){
+int main(int argc, char* argv[]){
     std::string name = "test";
-    N_aryTree tree(name,4);
-    tree.print();
+    std::string filePath = "./test.txt";
+    N_aryTree tree(name, filePath);
+    tree.print(std::cout);
 
 
 }

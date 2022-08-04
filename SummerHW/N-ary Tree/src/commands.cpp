@@ -47,16 +47,16 @@ void CommandProcessor::process_load_command(const LoadCommand& cmd)
     std::string src;
     if( cmd.file_name == "") //read from console
     {
-        std::cout << "Write the tree" << std::endl;
-        src = get_str_from_stream(std::cin,true);
+        std::cout <<"Cannot read tree from console." << std::endl;
+    
     }
     else 
     {
        std::ifstream file(cmd.file_name);
-       src = get_str_from_stream(file,false);
+        this->trees.emplace_back(N_aryTree(name, file));
+        this->names.emplace_back(name);     
     }
-    this->trees.emplace_back(N_aryTree(name, src));
-    this->names.emplace_back(name);   
+  
 }
 
 void CommandProcessor::process_contains_command(const ContainsCommand& cmd)

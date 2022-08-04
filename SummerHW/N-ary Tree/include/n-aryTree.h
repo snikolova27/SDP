@@ -25,12 +25,12 @@ class N_aryTree{
     // @Brief add a node to a specified root
     bool add(Node* toAdd, Node* root);
 
-    // @Brief load tree from a given string
-    bool readTree(const std::string& sourceString);
+    // @Brief load tree from a given file string
+    bool readTree(const  std::string & sourceFilenName);
 
     public:
-    // @Brief create tree from a given string
-    N_aryTree(const std::string& name, const std::string& sourceString);
+    // @Brief create tree from a given file stream
+    N_aryTree(const std::string& name, const  std::string & sourceFileName);
 
     //@Brief create an empty tree with a given name and root value
     N_aryTree(std::string& name,  int rootValue);
@@ -53,4 +53,8 @@ class N_aryTree{
     bool add(int value);
 
     void bfs(Node* node,std::ostream& streamToPrint);
+
+    Node* getRoot(){
+      return this->root;
+    }
 };
